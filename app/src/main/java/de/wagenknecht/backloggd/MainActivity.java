@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
         myWeb = findViewById(R.id.myWeb);
         myWeb.getSettings().setJavaScriptEnabled(true);
+        myWeb.getSettings().setDomStorageEnabled(true);
         myWeb.setWebViewClient(new WebViewClient());
         myWeb.loadUrl("https://backloggd.com/");
     }
