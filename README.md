@@ -1,5 +1,7 @@
 # Backloggd Android App
-
+[![Downloads Total](https://img.shields.io/github/downloads/wagenknecht/backloggd-android-app/total?style=for-the-badge)](https://github.com/wagenknecht/backloggd-android-app/releases/)
+[![Issues Badge](https://img.shields.io/github/issues/wagenknecht/backloggd-android-app?style=for-the-badge)](https://github.com/wagenknecht/backloggd-android-app/issues)
+[![Closed Issues Badge](https://img.shields.io/github/issues-closed/wagenknecht/backloggd-android-app?color=%238256d0&style=for-the-badge)](https://github.com/wagenknecht/backloggd-android-app/issues?q=is%3Aissue+is%3Aclosed)<br>
 This is an Android application for the website [backloggd.com](https://backloggd.com). Essentially, it's a wrapper for the website using a WebView. 
 
 ## Features
