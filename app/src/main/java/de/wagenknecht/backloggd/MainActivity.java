@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    WebView myWeb;
+    private WebView myWeb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +21,18 @@ public class MainActivity extends AppCompatActivity {
         myWeb.getSettings().setDomStorageEnabled(true);
         myWeb.setWebViewClient(new WebViewClient());
         myWeb.loadUrl("https://backloggd.com/");
+
+        // Handle back gesture
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (myWeb.canGoBack()) {
+                    myWeb.goBack();
+                } else {
+                    setEnabled(false);
+                }
+            }
+        });
     }
+
 }
