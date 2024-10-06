@@ -3,11 +3,10 @@
 # This config file contains the config of your webpages
 # You may also want to update /config/webpack.pwa.js in case you want to generate a Progressive Web App
 
-title: Screenshot Editor | Screenshot Maker | NeonFrame | Android mobile app
-email: support@mobile-dev.pro
-description: Make eye-catching screenshots you share on Twitter, Instagram, and others | Screenshot Maker | Screenshot Editor
-baseurl: "/neonframe.page/github-pages" # the subpath of your site, e.g. /blog
-url: "https://mobiledevpro.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+title: Backloggd Android App | Unoffical | Wagenknecht | Android mobile app
+description: An Android application for the website backloggd.com. Essentially, it's a wrapper for the website using a WebView.
+baseurl: "/Backloggd-Android-App/github-pages" # the subpath of your site, e.g. /blog
+url: "https://wagenknecht.github.io/backloggd" # the base hostname & protocol for your site, e.g. http://example.com
 theme_color: '#FF191C1D'
 twitter_username: mobiledev_pro
 github_username:  mobiledevpro
@@ -30,7 +29,7 @@ github: false
 ### Google webmaster tools, Google Analytics, Doorbell and Cookie consent uncomment and put the API key
 #webmaster_verifications:
 #google: verification_code
-google_analytics: G-7J55TB6YYJ
+#google_analytics: G-7J55TB6YYJ
 #doorbell:
 #  id: doorbell_id
 #  appKey: doorbell_appKey
