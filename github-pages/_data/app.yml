@@ -1,0 +1,25 @@
+name: Backloggd Android App (Unofficial)
+description: An Android application for the website backloggd.com. Essentially, it's a wrapper for the website using a WebView.
+full_description: '<b>v1.2 (Aug 7, 2024)</b><br>
+<br>- Added support for back gesture: so app does not close when moving back
+<br>
+<br><b>v1.1 (Aug 2, 2024)</b><br>
+<br>- Bug fix: Play Session notes menu did not open
+<br>
+<br><b>v1.0 (Jul 5, 2024)</b><br>
+<br>- Initial release'
+android: false
+iOS: false
+web: false
+GitHub: https://github.com/wagenknecht/Backloggd-Android-App/releases
+screenshots:
+  - 01-screenshot.png
+  - 02-screenshot.png
+  - 03-screenshot.png
+  - 04-screenshot.png
+producthunt: false
+#companies:
+#  - url: https://telegra.ph/Replace-this-link-07-23
+#    image: androidpolice.png
+#  - url: https://telegra.ph/Replace-this-link-07-23
+#    image: producthunt.png

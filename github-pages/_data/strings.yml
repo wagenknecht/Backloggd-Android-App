@@ -1,0 +1,18 @@
+app:
+  screenshots: Screenshots
+  description: Changelog
+
+  #featured: Featured in
+
+footer:
+  copyright: Made by <a href="https://github.com/wagenknecht" target="_blank">Wagenknecht</a>
+  links:
+    - title: LinkedIn
+      url: https://www.linkedin.com/in/wagenknecht/
+      target: _blank
+    - title: YouTube
+      url: https://www.youtube.com/@fwagenknecht
+      target: _blank
+    - title: GitHub
+      url: https://github.com/wagenknecht
+      target: _blank
