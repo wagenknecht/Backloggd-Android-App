@@ -6,7 +6,7 @@
 title: Screenshot Editor | Screenshot Maker | NeonFrame | Android mobile app
 email: support@mobile-dev.pro
 description: Make eye-catching screenshots you share on Twitter, Instagram, and others | Screenshot Maker | Screenshot Editor
-baseurl: "/neonframe.page" # the subpath of your site, e.g. /blog
+baseurl: "/neonframe.page/github-pages" # the subpath of your site, e.g. /blog
 url: "https://mobiledevpro.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 theme_color: '#FF191C1D'
 twitter_username: mobiledev_pro

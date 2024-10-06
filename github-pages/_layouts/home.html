@@ -18,6 +18,9 @@ layout: default
       {% if site.data.app.web != false %}
       <a href="{{ site.data.app.web }}" class="app__button-web" target="_blank"><img src="./assets/images/pwa-badge.png" alt="Go to website"></a>
       {% endif %}
+      {% if site.data.app.GitHub != false %}
+      <a href="{{ site.data.app.GitHub }}" class="app__button-github" target="_blank"><img src="./assets/images/github.png" alt="Get it on GitHub"></a>
+      {% endif %}
     </div>
   </div>
 </header>
@@ -30,6 +33,9 @@ layout: default
   {% endif %}
   {% if site.data.app.web != false %}
   <a href="{{ site.data.app.web }}" class="app__button-web" target="_blank"><img src="./assets/images/pwa-badge.png" alt="Go to website"></a>
+  {% endif %}
+  {% if site.data.app.GitHub != false %}
+  <a href="{{ site.data.app.GitHub }}" class="app__button-github" target="_blank"><img src="./assets/images/github.png" alt="Get it on GitHub"></a>
   {% endif %}
 </div>
 <section class="app__screenshots app__section">

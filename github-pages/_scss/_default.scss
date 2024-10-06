@@ -280,6 +280,12 @@ h1, h2 {
     }
   }
 
+  &__button-github {
+    img {
+      width: 252px * 0.7;
+    }
+  }
+
   @media (max-width: 768px) {
     &__button-play {
       img {
