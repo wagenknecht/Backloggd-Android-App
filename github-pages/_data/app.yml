@@ -1,0 +1,54 @@
+name: Screenshot Editor - NeonFrame
+description: Make eye-catching screenshots you share on Twitter, Instagram, and others.
+full_description: '<b>v1.8.4 (Sep 6, 2024)</b><br>
+<br>- Added support for Themed icons on Android 13+
+<br>- UI fixes and improvements
+<br>
+<br><b>v1.8.0 (July 29, 2024)</b><br>
+<br>- Auto-generated gradient
+<br>- Fixed incorrect image orientation
+<br>- Minor improvements
+<br>
+<br><b>v1.7.0 (June 18, 2024)</b><br>
+<br>- Added predefined gradient backgrounds.
+<br>
+<br><b>v1.6.0 (May 3, 2024)</b><br>
+<br>- Integrated In-App Review API
+<br>- Minor improvements
+<br>
+<br><b>v1.5.0 (Apr 13, 2024)</b><br>
+<br>- You can remove the watermark or set your own text instead for a small one-time fee.
+<br>- New Onboarding screen.
+<br>- Minor UI improvements.
+<br>
+<br><b>v1.4.0 (Mar 29, 2024)</b><br>
+<br>- Add own colors to glow and background
+<br>- Remove existing colors (long tap on color to activate a removing mode)
+<br>
+<br><b>v1.3.0 (Mar 18, 2024)</b><br>
+<br>- Added ability to receive the image from other apps via Android Sharesheet dialog
+<br>- Pinch to zoom-in/zoom-out the image when background is turned on
+<br>- Fix for splash screen on Android 12 and lower
+<br>- Minor UI fixes
+<br>
+<br><b>v1.2.0 (Mar 11, 2024)</b><br>
+<br>- Now you can add a background color and change the size: 1:1, 4:3, 9:16 for Instagram Stories, 2:1 for Twitter, 1.91:1 for LinkedIn
+<br>
+<br><b>v1.1.0 (Feb 16, 2024)</b><br>
+<br>- Added a new screen with sharing options once the image is exported
+<br>- Improved an image processing. Export takes less time now
+<br>- Added a new overview video to Google Play'
+android: https://play.google.com/store/apps/details?id=com.mobiledevpro.neonframe.app&utm_source=landing
+iOS: false
+web: false
+screenshots:
+  - 01-screenshot.png
+  - 02-screenshot.png
+  - 03-screenshot.png
+  - 04-screenshot.png
+producthunt: false
+#companies:
+#  - url: https://telegra.ph/Replace-this-link-07-23
+#    image: androidpolice.png
+#  - url: https://telegra.ph/Replace-this-link-07-23
+#    image: producthunt.png

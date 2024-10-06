@@ -1,0 +1,67 @@
+### Welcome to Jekyll Webpack Boilerplate
+#
+# This config file contains the config of your webpages
+# You may also want to update /config/webpack.pwa.js in case you want to generate a Progressive Web App
+
+title: Screenshot Editor | Screenshot Maker | NeonFrame | Android mobile app
+email: support@mobile-dev.pro
+description: Make eye-catching screenshots you share on Twitter, Instagram, and others | Screenshot Maker | Screenshot Editor
+baseurl: "/neonframe.page" # the subpath of your site, e.g. /blog
+url: "https://mobiledevpro.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+theme_color: '#FF191C1D'
+twitter_username: mobiledev_pro
+github_username:  mobiledevpro
+author: Dmitri Chernysh
+logo: assets/images/large-logo.png
+twitter:
+  username: mobiledev_pro
+social:
+  name: mobiledevpro
+  links:
+    - https://twitter.com/mobiledev_pro
+    - https://www.linkedin.com/in/dmitriychernysh
+    - https://github.com/dmitriy-chernysh
+
+languages: ["en"]
+ampdir: amp
+
+github: false
+
+### Google webmaster tools, Google Analytics, Doorbell and Cookie consent uncomment and put the API key
+#webmaster_verifications:
+#google: verification_code
+google_analytics: G-7J55TB6YYJ
+#doorbell:
+#  id: doorbell_id
+#  appKey: doorbell_appKey
+
+#cookie_consent: true
+
+### Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - octopress-minify-html
+  - amp-jekyll
+
+### Exclude from processing.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - _src
+  - _images
+  - LICENSE
+  - package.json
+  - README.md
+  - webpack.config.js
+  - yarn-error.log
+  - yarn.lock
+  - config
+  - optimization-fix
+  - optimization-fix-this-file-is-ignored.js
+  - icon.png
+  - docs
