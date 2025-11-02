@@ -1,13 +1,26 @@
 name: Backloggd Android App (Unofficial)
 description: An Android application for the website backloggd.com. Essentially, it's a wrapper for the website using a WebView.
-full_description: '<b>v1.2 (Aug 7, 2024)</b><br>
-<br>- Added support for back gesture: so app does not close when moving back
-<br>
-<br><b>v1.1 (Aug 2, 2024)</b><br>
-<br>- Bug fix: Play Session notes menu did not open
-<br>
-<br><b>v1.0 (Jul 5, 2024)</b><br>
-<br>- Initial release'
+full_description: '
+<b>v1.3 (2025-11-02)</b>
+<ul>
+  <li>Added an <strong>error page</strong> to display when the device has <strong>no internet connection</strong></li>
+  <li>Implemented an <strong>update check</strong> with a <strong>dialog</strong> for new app versions</li>
+  <li>Added a <strong>Settings page</strong> (currently a placeholder for future specific app adjustments)</li>
+  <li>Updated <strong>dependencies</strong></li>
+</ul>
+<b>v1.2 (2024-08-07)</b>
+<ul>
+  <li>Added support for back gesture: so app does not close when moving back</li>
+</ul>
+<b>v1.1 (2024-08-02)</b>
+<ul>
+  <li>Bug fix: Play Session notes menu did not open</li>
+</ul>
+<b>v1.0 (2024-07-05)</b>
+<ul>
+  <li>Initial release</li>
+</ul>
+'
 android: false
 iOS: false
 web: false
