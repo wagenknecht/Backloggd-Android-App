@@ -1,6 +1,7 @@
 <resources>
-        <string name="error_loading_page">Fehler beim Laden der Seite.\nBitte überprüfen Sie Ihre
+    <string name="error_loading_page">Fehler beim Laden der Seite.\nBitte überprüfen Sie Ihre
             Internetverbindung.
-        </string>
-        <string name="retry">Erneut versuchen</string>
+    </string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="settings">App Einstellungen</string>
 </resources>
