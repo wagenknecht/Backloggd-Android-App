@@ -1,6 +1,7 @@
 package de.wagenknecht.backloggd;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,9 +45,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         settingsButton.setOnClickListener(v -> {
-            if (myWeb.canGoBack()) {
-                myWeb.goBack();
-            }
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         });
 
         myWeb.setWebViewClient(new WebViewClient() {
