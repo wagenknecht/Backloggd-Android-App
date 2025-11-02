@@ -1,7 +1,11 @@
 package de.wagenknecht.backloggd;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +18,16 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton settingsButton;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/tags";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -100,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        checkForUpdates();
     }
 
     private void updateUiForUrl(String url) {
@@ -108,6 +124,54 @@ public class MainActivity extends AppCompatActivity {
             settingsButton.setVisibility(View.VISIBLE);
         } else {
             settingsButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void checkForUpdates() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, GITHUB_API_URL, null,
+                response -> {
+                    try {
+                        if (response.length() > 0) {
+                            JSONObject latestTag = response.getJSONObject(0);
+                            String latestVersion = latestTag.getString("name");
+                            String currentVersion = getCurrentVersionName(this);
+
+                            Log.d(TAG, "Latest version on GitHub: " + latestVersion);
+                            Log.d(TAG, "Current app version: " + currentVersion);
+
+                            if (!latestVersion.equals(currentVersion)) {
+                                showUpdateDialog(latestVersion);
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error parsing JSON for update check", e);
+                    }
+                },
+                error -> Log.e(TAG, "Error checking for updates", error)
+        );
+        queue.add(request);
+    }
+
+    private void showUpdateDialog(String newVersion) {
+        new AlertDialog.Builder(this)
+                .setTitle("Update Available")
+                .setMessage("A new version (" + newVersion + ") is available. Would you like to download it?")
+                .setPositiveButton("Download", (dialog, which) -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/wagenknecht/Backloggd-Android-App/releases"));
+                    startActivity(browserIntent);
+                })
+                .setNegativeButton("Later", null)
+                .show();
+    }
+
+    private String getCurrentVersionName(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Could not get package name", e);
+            return null;
         }
     }
 }
