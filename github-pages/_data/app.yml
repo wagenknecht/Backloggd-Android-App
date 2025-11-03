@@ -1,6 +1,11 @@
 name: Backloggd Android App (Unofficial)
 description: An Android application for the website backloggd.com. Essentially, it's a wrapper for the website using a WebView.
 full_description: '
+<b>v1.4 (2025-11-03)</b>
+<ul>
+  <li>Added support for **push notifications** from backloggd.com.</li>
+  <li>Added customizable **notification interval settings**.</li>
+</ul>
 <b>v1.3 (2025-11-02)</b>
 <ul>
   <li>Added an <strong>error page</strong> to display when the device has <strong>no internet connection</strong></li>
