@@ -39,6 +39,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.preference)
     implementation(libs.volley)
+    implementation(libs.work.runtime)
+    implementation(libs.jsoup)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

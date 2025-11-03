@@ -1,11 +1,13 @@
 package de.wagenknecht.backloggd;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,8 +20,16 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,6 +39,8 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends AppCompatActivity {
 
     private WebView myWeb;
@@ -37,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
     private static final String GITHUB_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/tags";
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d(TAG, "Notification permission granted.");
+                } else {
+                    Log.w(TAG, "Notification permission denied.");
+                }
+            });
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -116,6 +137,49 @@ public class MainActivity extends AppCompatActivity {
         });
 
         checkForUpdates();
+        askNotificationPermission();
+        startNotificationWorker();
+
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        String urlToLoad = intent.getStringExtra("urlToLoad");
+        if (urlToLoad != null) {
+            Log.d(TAG, "Intent received with URL: " + urlToLoad);
+            myWeb.loadUrl(urlToLoad);
+        }
+    }
+
+    private void startNotificationWorker() {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        PeriodicWorkRequest notificationWorkRequest =
+                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, 15, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "NotificationCheck",
+                ExistingPeriodicWorkPolicy.KEEP,
+                notificationWorkRequest);
+    }
+
+    private void askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                 Log.d(TAG, "Requesting notification permission.");
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void updateUiForUrl(String url) {
@@ -140,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "Latest version on GitHub: " + latestVersion);
                             Log.d(TAG, "Current app version: " + currentVersion);
 
-                            if (!latestVersion.equals(currentVersion)) {
+                            if (currentVersion != null && !latestVersion.equals(currentVersion)) {
                                 showUpdateDialog(latestVersion);
                             }
                         }
