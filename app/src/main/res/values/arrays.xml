@@ -1,0 +1,15 @@
+<resources>
+    <string-array name="notification_interval_entries">
+        <item>15 Minutes</item>
+        <item>1 Hour</item>
+        <item>4 Hours</item>
+        <item>Never</item>
+    </string-array>
+
+    <string-array name="notification_interval_values">
+        <item>15</item>
+        <item>60</item>
+        <item>240</item>
+        <item>-1</item>
+    </string-array>
+</resources>

@@ -4,11 +4,13 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceError;
@@ -158,19 +160,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startNotificationWorker() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        long interval = Long.parseLong(prefs.getString("notification_interval", "15"));
+
+        if (interval == -1) {
+            WorkManager.getInstance(this).cancelUniqueWork("NotificationCheck");
+            Log.d(TAG, "Notification worker cancelled by user setting.");
+            return;
+        }
+
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
         PeriodicWorkRequest notificationWorkRequest =
-                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, 15, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, interval, TimeUnit.MINUTES)
                         .setConstraints(constraints)
                         .build();
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "NotificationCheck",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 notificationWorkRequest);
+        
+        Log.d(TAG, "Notification worker scheduled for every " + interval + " minutes.");
     }
 
     private void askNotificationPermission() {

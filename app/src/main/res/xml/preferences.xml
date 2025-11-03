@@ -1,8 +1,11 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SwitchPreferenceCompat
-        app:key="dark_mode"
-        app:title="Dark Mode"
-        app:summary="Just a test value" />
+    <ListPreference
+        app:key="notification_interval"
+        app:title="Notification Interval"
+        app:summary="How often to check for new notifications?"
+        app:entries="@array/notification_interval_entries"
+        app:entryValues="@array/notification_interval_values"
+        app:defaultValue="15" />
 
 </PreferenceScreen>
