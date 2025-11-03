@@ -129,11 +129,6 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (myWeb.canGoBack()) {
                     myWeb.goBack();
-                } else {
-                    if (isEnabled()) {
-                        setEnabled(false);
-                        MainActivity.this.getOnBackPressedDispatcher().onBackPressed();
-                    }
                 }
             }
         });
@@ -235,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Update Available")
                 .setMessage("A new version (" + newVersion + ") is available. Would you like to download it?")
                 .setPositiveButton("Download", (dialog, which) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/wagenknecht/Backloggd-Android-App/releases"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/wagenknecht/Backloggd-Android-App/releases/latest"));
                     startActivity(browserIntent);
                 })
                 .setNegativeButton("Later", null)

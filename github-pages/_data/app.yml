@@ -3,8 +3,8 @@ description: An Android application for the website backloggd.com. Essentially, 
 full_description: '
 <b>v1.4 (2025-11-03)</b>
 <ul>
-  <li>Added support for **push notifications** from backloggd.com.</li>
-  <li>Added customizable **notification interval settings**.</li>
+  <li>Added support for <strong>push notifications</strong> from backloggd.com.</li>
+  <li>Added customizable notification interval settings.</li>
 </ul>
 <b>v1.3 (2025-11-02)</b>
 <ul>
