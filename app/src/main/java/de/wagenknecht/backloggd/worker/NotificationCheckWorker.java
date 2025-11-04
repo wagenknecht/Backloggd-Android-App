@@ -1,4 +1,4 @@
-package de.wagenknecht.backloggd;
+package de.wagenknecht.backloggd.worker;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -28,6 +28,9 @@ import org.jsoup.select.Elements;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import de.wagenknecht.backloggd.MainActivity;
+import de.wagenknecht.backloggd.R;
 
 public class NotificationCheckWorker extends Worker {
 

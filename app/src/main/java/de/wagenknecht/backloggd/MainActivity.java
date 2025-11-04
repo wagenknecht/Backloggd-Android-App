@@ -43,6 +43,9 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
+import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
+import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
+
 public class MainActivity extends AppCompatActivity {
 
     private WebView myWeb;
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         checkForUpdates();
         askNotificationPermission();
         startNotificationWorker();
+        WishlistCheckerWorker.scheduleNextWorker(this);
 
         handleIntent(getIntent());
     }
@@ -177,14 +181,14 @@ public class MainActivity extends AppCompatActivity {
                 "NotificationCheck",
                 ExistingPeriodicWorkPolicy.UPDATE,
                 notificationWorkRequest);
-        
+
         Log.d(TAG, "Notification worker scheduled for every " + interval + " minutes.");
     }
 
     private void askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                 Log.d(TAG, "Requesting notification permission.");
+                Log.d(TAG, "Requesting notification permission.");
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
