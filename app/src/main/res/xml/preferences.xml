@@ -19,6 +19,12 @@
             app:title="Reminder Time"
             app:summary="Set the time for the daily reminder (default 9:00)"/>
 
+        <EditTextPreference
+            app:key="backloggd_username"
+            app:title="Backloggd Username"
+            app:summary="The username is needed for this feature."
+            app:dialogMessage="Enter your Backloggd username."/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+import android.webkit.CookieManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -24,6 +25,7 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,8 +50,6 @@ public class WishlistCheckerWorker extends Worker {
     private static final String TAG = "WishlistCheckerWorker";
     private static final String CHANNEL_ID = "BACKLOGGD_WISHLIST_RELEASE";
     public static final String WORK_NAME = "WishlistChecker";
-    //todo username and year are hardcode
-    private static final String WISHLIST_URL = "https://backloggd.com/u/Tysk/wishlist/release/type:wishlist;release_year:2025";
 
     public WishlistCheckerWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -59,13 +59,55 @@ public class WishlistCheckerWorker extends Worker {
     @Override
     public Result doWork() {
         Log.d(TAG, "Worker started. Checking wishlist for games releasing today.");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String username = prefs.getString("backloggd_username", null);
+
+
+        if (username == null || username.isEmpty()) {
+            Log.d(TAG, "Username not found, trying to fetch from settings page.");
+
+            String cookies = CookieManager.getInstance().getCookie("https://backloggd.com/notifications/");
+            if (cookies == null || cookies.isEmpty()) {
+                Log.w(TAG, "Could not get cookies. User is probably not logged in. Aborting.");
+                return Result.success();
+            }
+
+            try {
+                Connection.Response response = Jsoup.connect("https://backloggd.com/settings")
+                        .cookie("Cookie", cookies)
+                        .execute();
+                if (response.statusCode() == 404) {
+                    Log.w(TAG, "User not logged in, settings page returned 404. Retrying in 30 minutes.");
+                    scheduleRetry(getApplicationContext(), 30, TimeUnit.MINUTES);
+                    return Result.failure();
+                }
+                Document settingsDoc = response.parse();
+                // Find the input field with id 'user_username' and extract its 'value' attribute.
+                Element usernameInput = settingsDoc.selectFirst("input#user_username");
+                if (usernameInput != null) {
+                    username = usernameInput.val();
+                    prefs.edit().putString("backloggd_username", username).apply();
+                    Log.d(TAG, "Found and saved username: " + username);
+                } else {
+                    Log.w(TAG, "Could not find username on settings page. Retrying in 30 minutes.");
+                    scheduleRetry(getApplicationContext(), 30, TimeUnit.MINUTES);
+                    return Result.failure();
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to connect to Backloggd settings page.", e);
+                return Result.retry();
+            }
+        }
+
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        String wishlistUrl = "https://backloggd.com/u/" + username + "/wishlist/release/type:wishlist;release_year:" + currentYear;
 
         try {
-            Document doc = Jsoup.connect(WISHLIST_URL).get();
+            Document doc = Jsoup.connect(wishlistUrl).get();
             Elements gameElements = doc.select("#user-games-library-container .rating-hover");
 
             if (gameElements.isEmpty()) {
-                Log.d(TAG, "No games found on the wishlist page.");
+                Log.d(TAG, "No games found on the wishlist page for the current year.");
             } else {
                 for (Element gameElement : gameElements) {
                     String gameTitle = gameElement.select(".game-text-centered").text();
@@ -77,14 +119,14 @@ public class WishlistCheckerWorker extends Worker {
                     }
 
                     if (isReleasedToday(releaseDateStr)) {
-                        SharedPreferences prefs = getApplicationContext().getSharedPreferences("wishlist_release_dates", Context.MODE_PRIVATE);
-                        String storedDate = prefs.getString(gameTitle, "");
+                        SharedPreferences releasePrefs = getApplicationContext().getSharedPreferences("wishlist_release_dates", Context.MODE_PRIVATE);
+                        String storedDate = releasePrefs.getString(gameTitle, "");
 
                         if (!releaseDateStr.equals(storedDate)) {
                             Log.d(TAG, "Found game releasing today: " + gameTitle);
                             Bitmap gameCoverBitmap = getBitmapFromUrl(imageUrl);
                             showPushNotification("Releasing Today!", gameTitle + " is out now!", gameTitle, gameCoverBitmap);
-                            prefs.edit().putString(gameTitle, releaseDateStr).apply();
+                            releasePrefs.edit().putString(gameTitle, releaseDateStr).apply();
                         } else {
                             Log.d(TAG, "Already notified for today's release of " + gameTitle);
                         }
@@ -115,7 +157,6 @@ public class WishlistCheckerWorker extends Worker {
     }
 
     private boolean isReleasedToday(String releaseDateStr) {
-        // Handle multiple date formats from the website
         SimpleDateFormat formatWithComma = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
         SimpleDateFormat formatWithoutComma = new SimpleDateFormat("MMM dd yyyy", Locale.ENGLISH);
         Date releaseDate;
@@ -127,15 +168,14 @@ public class WishlistCheckerWorker extends Worker {
                 releaseDate = formatWithoutComma.parse(releaseDateStr);
             } catch (ParseException e2) {
                 Log.w(TAG, "Could not parse date: " + releaseDateStr);
-                return false; // Skip if date is in an unknown format
+                return false;
             }
         }
 
         Calendar today = Calendar.getInstance();
         Calendar releaseCal = Calendar.getInstance();
         releaseCal.setTime(releaseDate);
-        Log.d(TAG, today.get(Calendar.YEAR) + "-" + today.get(Calendar.MONTH) + "-" + today.get(Calendar.DAY_OF_MONTH));
-        Log.d(TAG, releaseCal.get(Calendar.YEAR) + "-" + releaseCal.get(Calendar.MONTH) + "-" + releaseCal.get(Calendar.DAY_OF_MONTH));
+
         return today.get(Calendar.YEAR) == releaseCal.get(Calendar.YEAR) &&
                 today.get(Calendar.MONTH) == releaseCal.get(Calendar.MONTH) &&
                 today.get(Calendar.DAY_OF_MONTH) == releaseCal.get(Calendar.DAY_OF_MONTH);
@@ -210,5 +250,18 @@ public class WishlistCheckerWorker extends Worker {
                 workRequest);
 
         Log.d(TAG, "Wishlist checker worker scheduled to run at " + nextRun.getTime());
+    }
+
+    private static void scheduleRetry(Context context, long delay, TimeUnit unit) {
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(WishlistCheckerWorker.class)
+                .setInitialDelay(delay, unit)
+                .build();
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+                WORK_NAME,
+                ExistingWorkPolicy.REPLACE, // Replace any existing retry
+                workRequest);
+
+        Log.d(TAG, "Wishlist checker worker retry scheduled in " + delay + " " + unit.toString().toLowerCase());
     }
 }

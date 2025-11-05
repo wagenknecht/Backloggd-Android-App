@@ -219,8 +219,7 @@ public class MainActivity extends AppCompatActivity {
                             if (currentVersion != null && !latestVersion.equals(currentVersion)) {
                                 showUpdateDialog(latestVersion);
                             }
-                        }
-                    } catch (JSONException e) {
+                        }                    } catch (JSONException e) {
                         Log.e(TAG, "Error parsing JSON for update check", e);
                     }
                 },
