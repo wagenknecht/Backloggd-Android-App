@@ -1,5 +1,7 @@
 package de.wagenknecht.backloggd.worker;
 
+import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -29,13 +31,13 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import de.wagenknecht.backloggd.ApiConstants;
 import de.wagenknecht.backloggd.MainActivity;
 import de.wagenknecht.backloggd.R;
 
 public class NotificationCheckWorker extends Worker {
 
     private static final String TAG = "NotificationCheckWorker";
-    private static final String NOTIFICATION_URL = "https://backloggd.com/notifications/";
     private static final String CHANNEL_ID = "BACKLOGGD_NOTIFICATIONS";
 
     public NotificationCheckWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {

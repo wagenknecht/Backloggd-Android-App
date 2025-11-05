@@ -1,5 +1,10 @@
 package de.wagenknecht.backloggd;
 
+import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
+import static de.wagenknecht.backloggd.ApiConstants.GITHUB_TAGS_API_URL;
+import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
+import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -23,6 +28,7 @@ import android.widget.LinearLayout;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -46,13 +52,12 @@ import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
 import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
 
 public class MainActivity extends AppCompatActivity {
-
     private WebView myWeb;
     private LinearLayout errorLayout;
     private Button settingsButton;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/tags";
+
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -124,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        myWeb.loadUrl("https://backloggd.com/");
+        myWeb.loadUrl(BACKLOGGD_URL);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -144,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         handleIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
+    private void handleIntent(@NonNull Intent intent) {
         String urlToLoad = intent.getStringExtra("urlToLoad");
         if (urlToLoad != null) {
             Log.d(TAG, "Intent received with URL: " + urlToLoad);
@@ -195,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUiForUrl(String url) {
         Log.d(TAG, "Current URL: " + url);
-        if ("https://backloggd.com/settings/".equals(url)) {
+        if (url != null && url.startsWith(SETTINGS_URL)) {
             settingsButton.setVisibility(View.VISIBLE);
         } else {
             settingsButton.setVisibility(View.GONE);
@@ -204,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkForUpdates() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, GITHUB_API_URL, null,
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, GITHUB_TAGS_API_URL, null,
                 response -> {
                     try {
                         if (response.length() > 0) {
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Update Available")
                 .setMessage("A new version (" + newVersion + ") is available. Would you like to download it?")
                 .setPositiveButton("Download", (dialog, which) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/wagenknecht/Backloggd-Android-App/releases/latest"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_LATEST));
                     startActivity(browserIntent);
                 })
                 .setNegativeButton("Later", null)

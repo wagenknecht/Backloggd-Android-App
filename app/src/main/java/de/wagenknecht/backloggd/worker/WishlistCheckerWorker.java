@@ -1,5 +1,9 @@
 package de.wagenknecht.backloggd.worker;
 
+import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
+import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
+import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -42,6 +46,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import de.wagenknecht.backloggd.ApiConstants;
 import de.wagenknecht.backloggd.MainActivity;
 import de.wagenknecht.backloggd.R;
 
@@ -66,14 +71,14 @@ public class WishlistCheckerWorker extends Worker {
         if (username == null || username.isEmpty()) {
             Log.d(TAG, "Username not found, trying to fetch from settings page.");
 
-            String cookies = CookieManager.getInstance().getCookie("https://backloggd.com/notifications/");
+            String cookies = CookieManager.getInstance().getCookie(NOTIFICATION_URL);
             if (cookies == null || cookies.isEmpty()) {
                 Log.w(TAG, "Could not get cookies. User is probably not logged in. Aborting.");
                 return Result.success();
             }
 
             try {
-                Connection.Response response = Jsoup.connect("https://backloggd.com/settings")
+                Connection.Response response = Jsoup.connect(SETTINGS_URL)
                         .cookie("Cookie", cookies)
                         .execute();
                 if (response.statusCode() == 404) {
@@ -100,7 +105,7 @@ public class WishlistCheckerWorker extends Worker {
         }
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        String wishlistUrl = "https://backloggd.com/u/" + username + "/wishlist/release/type:wishlist;release_year:" + currentYear;
+        String wishlistUrl = BACKLOGGD_URL + "/u/" + username + "/wishlist/release/type:wishlist;release_year:" + currentYear;
 
         try {
             Document doc = Jsoup.connect(wishlistUrl).get();
