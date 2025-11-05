@@ -7,4 +7,39 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Farben von der Backloggd Webseite -->
+    <color name="back_primary">#16181C</color>
+    <color name="back_secondary">#242832</color>
+    <color name="back_highlight">#4F262B37</color> <!-- teil-transparent -->
+    <color name="back_field">#30394C</color>
+    <color name="back_field_highlight">#3B4760</color>
+    <color name="back_interact">#4A5E8D</color>
+    <color name="back_interact_secondary">#839DF9</color>
+    <color name="back_pink">#FC6399</color>
+    <color name="back_pink_dk">#EA377A</color>
+    <color name="back_btn_toggled_text">#FFFFFFFF</color>
+    <color name="back_text">#BADEFC</color>
+    <color name="back_text_secondary">#8F9CA7</color>
+    <color name="back_text_disabled">#618F9CA7</color> <!-- teil-transparent -->
+    <color name="back_link">#CBD4DC</color>
+    <color name="back_type_completed">#43B94F</color>
+    <color name="back_type_mastered">#8D58AF</color>
+    <color name="back_type_abandoned">#EA4747</color>
+    <color name="back_type_retired">#4B7BD4</color>
+    <color name="back_type_shelved">#E69B3E</color>
+    <color name="back_playing">#856FEF</color>
+    <color name="back_wishlist">#70A9C8</color>
+    <color name="back_backlog">#EFE36F</color>
+    <color name="back_field_background">#272C37</color>
+    <color name="back_field_border">#3B414E</color>
+    <color name="back_field_border_hover">#3F4B64</color>
+    <color name="back_field_placeholder">#47C5D7E7</color> <!-- teil-transparent -->
+
+    <!-- Aliase für referenzierte Farben -->
+    <color name="back_field_selected">@color/back_pink_dk</color>
+    <color name="back_type_played">@color/back_pink_dk</color>
+    <color name="back_field_border_focus">@color/back_interact_secondary</color>
+    <color name="back_field_icon">@color/back_field_border</color>
+    <color name="back_field_icon_secondary">@color/back_field_border_hover</color>
 </resources>

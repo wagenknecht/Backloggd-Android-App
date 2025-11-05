@@ -18,7 +18,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
@@ -50,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView myWeb;
     private LinearLayout errorLayout;
-    private ImageButton settingsButton;
+    private Button settingsButton;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
     private static final String GITHUB_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/tags";
