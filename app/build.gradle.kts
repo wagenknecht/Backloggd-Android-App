@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "de.wagenknecht.backloggd"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.wagenknecht.backloggd"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.4.1"
 
