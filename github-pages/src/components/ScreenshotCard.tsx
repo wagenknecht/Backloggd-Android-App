@@ -10,16 +10,27 @@ interface ScreenshotCardProps {
 
 export function ScreenshotCard({ src, alt, compact = false }: ScreenshotCardProps) {
   const [hasError, setHasError] = useState(false)
+  const [aspectRatio, setAspectRatio] = useState<string | null>(null)
 
   return (
     <Card className={`overflow-hidden group hover:shadow-lg transition-shadow ${compact ? 'border' : 'border-2'}`}>
-      <div className="aspect-[9/16] bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center relative overflow-hidden">
+      <div
+        className="bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center relative overflow-hidden"
+        style={aspectRatio ? { aspectRatio } : undefined}
+      >
         {!hasError ? (
           <img 
             src={src} 
             alt={alt}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
             onError={() => setHasError(true)}
+            onLoad={(e) => {
+              const img = e.currentTarget
+              // Set dynamic aspect ratio from natural dimensions to avoid cropping
+              if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                setAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`)
+              }
+            }}
             loading="lazy"
           />
         ) : (

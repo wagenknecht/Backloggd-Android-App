@@ -88,7 +88,7 @@ function App() {
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div key={num} className="flex-shrink-0 w-[180px] snap-center">
                 <ScreenshotCard
-                  src={`/screenshot${num}.png`}
+                  src={`${import.meta.env.BASE_URL}screenshot${num}.png`}
                   alt={`Backloggd App Screenshot ${num}`}
                   compact={true}
                 />
@@ -102,7 +102,7 @@ function App() {
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <ScreenshotCard
               key={num}
-              src={`/screenshot${num}.png`}
+              src={`${import.meta.env.BASE_URL}screenshot${num}.png`}
               alt={`Backloggd App Screenshot ${num}`}
             />
           ))}
