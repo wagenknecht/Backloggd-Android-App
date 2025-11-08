@@ -5,13 +5,14 @@ import { MobileNav } from "@/components/MobileNav"
 import { githubUrls, config } from "@/config"
 import { RepoStats } from "@/components/RepoStats"
 import { Smartphone, Download, Github, ExternalLink, Star, BellRing, CalendarCheck, Clock, Maximize, AppWindow, Shield } from "lucide-react"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       {/* Navigation - Mobile First */}
       <nav className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
+        <div className="container mx-auto px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Smartphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -28,6 +29,7 @@ function App() {
               <a href="#download">
                 <Button size="sm">Download</Button>
               </a>
+              <ThemeToggle />
             </div>
             {/* Mobile Navigation */}
             <MobileNav />
@@ -36,9 +38,9 @@ function App() {
       </nav>
 
       {/* Hero Section - Mobile First */}
-      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
-        <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6 text-center">
-          <div className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs sm:text-sm">
+      <section className="container mx-auto px-4 pt-8 sm:pt-10 md:pt-12 pb-4 sm:pb-6 md:pb-8">
+        <div className="max-w-3xl mx-auto space-y-3 sm:space-y-4 text-center">
+          <div className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs sm:text-sm">
             <Star className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4 fill-primary text-primary" />
             <span>Inoffizielle Android App für backloggd.com</span>
           </div>
@@ -55,7 +57,7 @@ function App() {
             ⚠️ Diese App erweitert die Funktionen von backloggd.com und ist nicht offiziell mit backloggd.com verbunden.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 px-4">
-            <a href="#download" className="w-full sm:w-auto">
+            <a href={githubUrls.latestRelease} className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8">
                 <Download className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 Jetzt herunterladen

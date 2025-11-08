@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { Menu, X } from "lucide-react"
 
 export function MobileNav() {
@@ -41,6 +42,10 @@ export function MobileNav() {
                   {item.label}
                 </a>
               ))}
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
+              </div>
               <a
                 href="#download"
                 onClick={() => setIsOpen(false)}
