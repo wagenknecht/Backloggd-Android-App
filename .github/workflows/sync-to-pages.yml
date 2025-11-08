@@ -1,0 +1,49 @@
+name: Sync to github-pages branch
+
+# Optionaler Workflow: Synct automatisch Änderungen von main zu github-pages
+# Diesen Workflow kannst du aktivieren, wenn du willst, dass Änderungen
+# automatisch auf github-pages gepusht werden, wenn du auf main pusht.
+# 
+# Hinweis: Dieser Workflow ist standardmäßig deaktiviert. 
+# Um ihn zu aktivieren, entferne die "#" Kommentare unten oder ändere den Branch-Namen.
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Sync to github-pages branch
+        run: |
+          # Prüfe ob github-pages Branch existiert
+          if git ls-remote --heads origin github-pages | grep -q github-pages; then
+            git fetch origin github-pages:github-pages
+            git checkout github-pages
+            git merge origin/main --no-edit -m "Sync from main branch"
+            git push origin github-pages
+          else
+            # Erstelle neuen Branch falls er nicht existiert
+            git checkout -b github-pages
+            git push -u origin github-pages
+          fi
+
