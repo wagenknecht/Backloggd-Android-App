@@ -14,7 +14,7 @@ export const config = {
 export const githubUrls = {
   repository: `https://github.com/${config.github.username}/${config.github.repository}`,
   releases: `https://github.com/${config.github.username}/${config.github.repository}/releases`,
-  latestRelease: `https://github.com/${config.github.username}/${config.github.repository}/releases/latest`,
+  latestRelease: `https://github.com/${config.github.username}/${config.github.repository}/releases/latest/download/backloggd.apk`,
 }
 
 
