@@ -21,9 +21,18 @@
 
         <EditTextPreference
             app:key="backloggd_username"
-            app:title="Backloggd Username"
+            app:title="Your Backloggd Username"
             app:summary="The username is needed for this feature."
             app:dialogMessage="Enter your Backloggd username."/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="About">
+
+        <Preference
+            app:key="developer_link"
+            app:title="Developer"
+            app:summary="Tysk" />
 
     </PreferenceCategory>
 

@@ -105,6 +105,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         myWeb.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                if (url.contains("backloggd.com")) {
+                    return false;
+                }
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                startActivity(intent);
+                return true;
+            }
+
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
@@ -140,13 +153,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        myWeb.loadUrl(BACKLOGGD_URL);
-
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (myWeb.canGoBack()) {
                     myWeb.goBack();
+                } else {
+                    finish();
                 }
             }
         });
@@ -162,14 +175,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
         handleIntent(intent);
     }
 
     private void handleIntent(@NonNull Intent intent) {
-        String urlToLoad = intent.getStringExtra("urlToLoad");
-        if (urlToLoad != null) {
-            Log.d(TAG, "Intent received with URL: " + urlToLoad);
-            myWeb.loadUrl(urlToLoad);
+        String action = intent.getAction();
+        Uri data = intent.getData();
+
+        if (Intent.ACTION_VIEW.equals(action) && data != null) {
+            myWeb.loadUrl(data.toString());
+        } else if (intent.hasExtra("urlToLoad")) {
+            String urlToLoad = intent.getStringExtra("urlToLoad");
+            if (urlToLoad != null) {
+                myWeb.loadUrl(urlToLoad);
+            }
+        } else {
+            myWeb.loadUrl(BACKLOGGD_URL);
         }
     }
 
