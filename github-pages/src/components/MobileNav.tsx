@@ -2,14 +2,17 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Menu, X } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
+import { LanguageToggle } from "@/components/LanguageToggle"
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useI18n()
 
   const navItems = [
-    { href: "#screenshots", label: "Screenshots" },
-    { href: "#features", label: "Features" },
-    { href: "#download", label: "Download" },
+    { href: "#screenshots", label: t("nav.screenshots") },
+    { href: "#features", label: t("nav.features") },
+    { href: "#download", label: t("nav.download") },
   ]
 
   return (
@@ -46,12 +49,16 @@ export function MobileNav() {
                 <span className="text-sm text-muted-foreground">Theme</span>
                 <ThemeToggle />
               </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-muted-foreground">Language</span>
+                <LanguageToggle />
+              </div>
               <a
                 href="#download"
                 onClick={() => setIsOpen(false)}
                 className="block mt-4"
               >
-                <Button className="w-full">Download</Button>
+                <Button className="w-full">{t("nav.download")}</Button>
               </a>
             </div>
           </nav>
