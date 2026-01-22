@@ -23,6 +23,16 @@ To install the app, download the latest APK from the [releases page](https://git
 1. Open the app.
 2. Enjoy the fullscreen experience of Backloggd.
 
+## Star History
+
+<a href="https://www.star-history.com/#wagenknecht/Backloggd-Android-App&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
