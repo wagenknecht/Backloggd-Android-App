@@ -6,6 +6,8 @@ This is an Android application for the website [backloggd.com](https://backloggd
 
 ## Features
 
+- Native Android Push Notifications
+- Game Release Notifications
 - Fullscreen viewing of Backloggd.
 - Full display of the icon in the Android launcher.
 - Support for adaptive icons.
