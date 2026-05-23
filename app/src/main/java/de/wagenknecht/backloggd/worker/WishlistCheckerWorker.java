@@ -79,7 +79,7 @@ public class WishlistCheckerWorker extends Worker {
 
             try {
                 Connection.Response response = Jsoup.connect(SETTINGS_URL)
-                        .cookie("Cookie", cookies)
+                        .header("Cookie", cookies)
                         .execute();
                 if (response.statusCode() == 404) {
                     Log.w(TAG, "User not logged in, settings page returned 404. Retrying in 30 minutes.");

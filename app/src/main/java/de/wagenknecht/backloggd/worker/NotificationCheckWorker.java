@@ -57,7 +57,7 @@ public class NotificationCheckWorker extends Worker {
 
         try {
             Document doc = Jsoup.connect(NOTIFICATION_URL)
-                    .cookie("Cookie", cookies)
+                    .header("Cookie", cookies)
                     .get();
 
             Elements unreadNotifications = doc.select(".notification.unread");
