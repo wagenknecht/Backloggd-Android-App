@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Jsoup ships with an optional re2j regex backend. We don't bundle re2j,
+# so silence the warnings — jsoup falls back to java.util.regex at runtime.
+-dontwarn com.google.re2j.**
