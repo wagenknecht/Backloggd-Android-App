@@ -1,8 +1,15 @@
 package de.wagenknecht.backloggd;
 
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
+import static de.wagenknecht.backloggd.ApiConstants.GITHUB_REPO_URL;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_TAGS_API_URL;
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
+import static de.wagenknecht.backloggd.ApiConstants.LISTS_URL;
+import static de.wagenknecht.backloggd.ApiConstants.LOGIN_URL;
+import static de.wagenknecht.backloggd.ApiConstants.LOGOUT_URL;
+import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
+import static de.wagenknecht.backloggd.ApiConstants.REVIEWS_URL;
+import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -32,6 +39,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -45,7 +53,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -54,6 +64,7 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
+import de.wagenknecht.backloggd.util.UsernameHelper;
 import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
 import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
 
@@ -62,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout errorLayout;
     private Button settingsButton;
     private BottomNavigationView bottomNav;
+    private DrawerLayout drawerLayout;
+    private NavigationView drawerNav;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
 
@@ -124,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
         errorLayout = findViewById(R.id.errorLayout);
         settingsButton = findViewById(R.id.settingsButton);
         bottomNav = findViewById(R.id.bottomNav);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        drawerNav = findViewById(R.id.drawerNav);
         Button retryButton = findViewById(R.id.retryButton);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -204,7 +219,9 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (myWeb.canGoBack()) {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else if (myWeb.canGoBack()) {
                     myWeb.goBack();
                 } else {
                     finish();
@@ -233,13 +250,42 @@ public class MainActivity extends AppCompatActivity {
 
         if (Intent.ACTION_VIEW.equals(action) && data != null) {
             myWeb.loadUrl(data.toString());
-        } else if (intent.hasExtra("urlToLoad")) {
+            return;
+        }
+        if (intent.hasExtra("urlToLoad")) {
             String urlToLoad = intent.getStringExtra("urlToLoad");
             if (urlToLoad != null) {
                 myWeb.loadUrl(urlToLoad);
             }
-        } else {
+            return;
+        }
+        if (intent.hasExtra("postLaunchAction")) {
+            runPostLaunchAction(intent.getStringExtra("postLaunchAction"));
+            return;
+        }
+        if (myWeb.getUrl() == null) {
             myWeb.loadUrl(BACKLOGGD_URL);
+        }
+    }
+
+    private void runPostLaunchAction(String action) {
+        if (action == null) return;
+        switch (action) {
+            case "home":
+                myWeb.loadUrl(BACKLOGGD_URL);
+                break;
+            case "log_game":
+                myWeb.evaluateJavascript(LOG_GAME_JS, null);
+                break;
+            case "search":
+                triggerSearch();
+                break;
+            case "profile":
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u));
+                break;
+            case "more":
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
         }
     }
 
@@ -307,18 +353,16 @@ public class MainActivity extends AppCompatActivity {
                 triggerSearch();
                 return false;
             } else if (id == R.id.nav_profile) {
-                String username = PreferenceManager.getDefaultSharedPreferences(this)
-                        .getString("backloggd_username", null);
-                if (username != null && !username.isEmpty()) {
-                    myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username);
-                } else {
-                    Toast.makeText(this, R.string.login_required, Toast.LENGTH_SHORT).show();
-                    myWeb.loadUrl(BACKLOGGD_URL);
-                }
+                withUsername(username -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username));
                 return true;
+            } else if (id == R.id.nav_more) {
+                drawerLayout.openDrawer(GravityCompat.START);
+                return false;
             }
             return false;
         });
+
+        setupDrawerNav();
 
         bottomNav.setOnItemReselectedListener(item -> {
             int id = item.getItemId();
@@ -326,6 +370,27 @@ public class MainActivity extends AppCompatActivity {
                 myWeb.evaluateJavascript(LOG_GAME_JS, null);
             } else if (id == R.id.nav_search) {
                 triggerSearch();
+            }
+        });
+    }
+
+    private interface UsernameAction {
+        void run(String username);
+    }
+
+    private void withUsername(UsernameAction action) {
+        String cached = UsernameHelper.getCached(this);
+        if (cached != null) {
+            action.run(cached);
+            return;
+        }
+        Toast.makeText(this, R.string.fetching_username, Toast.LENGTH_SHORT).show();
+        UsernameHelper.fetchAsync(this, username -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (username != null) {
+                action.run(username);
+            } else {
+                myWeb.loadUrl(LOGIN_URL);
             }
         });
     }
@@ -339,6 +404,33 @@ public class MainActivity extends AppCompatActivity {
                 imm.showSoftInput(myWeb, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 150);
+    }
+
+    private void setupDrawerNav() {
+        drawerNav.setNavigationItemSelectedListener(item -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            int id = item.getItemId();
+            if (id == R.id.drawer_notifications) {
+                myWeb.loadUrl(NOTIFICATION_URL);
+            } else if (id == R.id.drawer_wishlist) {
+                withUsername(username -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username + "/wishlist"));
+            } else if (id == R.id.drawer_reviews) {
+                myWeb.loadUrl(REVIEWS_URL);
+            } else if (id == R.id.drawer_lists) {
+                myWeb.loadUrl(LISTS_URL);
+            } else if (id == R.id.drawer_backloggd_settings) {
+                myWeb.loadUrl(SETTINGS_URL);
+            } else if (id == R.id.drawer_app_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+            } else if (id == R.id.drawer_login) {
+                myWeb.loadUrl(LOGIN_URL);
+            } else if (id == R.id.drawer_logout) {
+                myWeb.loadUrl(LOGOUT_URL);
+            } else if (id == R.id.drawer_about) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_REPO_URL)));
+            }
+            return true;
+        });
     }
 
     private void updateBottomNavSelection(String url) {
@@ -355,9 +447,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (path.startsWith("/search")) {
             itemId = R.id.nav_search;
         } else if (path.startsWith("/u/")) {
-            String username = PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString("backloggd_username", null);
-            if (username != null && !username.isEmpty()
+            String username = UsernameHelper.getCached(this);
+            if (username != null
                     && (path.equals("/u/" + username) || path.startsWith("/u/" + username + "/"))) {
                 itemId = R.id.nav_profile;
             }

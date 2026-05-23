@@ -7,5 +7,18 @@
     <string name="nav_log_game">Log a game</string>
     <string name="nav_search">Search</string>
     <string name="nav_profile">My profile</string>
+    <string name="nav_more">More</string>
     <string name="login_required">Please log in to view your profile.</string>
+    <string name="fetching_username">Loading your profile…</string>
+    <string name="drawer_open">Open menu</string>
+    <string name="drawer_close">Close menu</string>
+    <string name="drawer_notifications">Notifications</string>
+    <string name="drawer_wishlist">Wishlist</string>
+    <string name="drawer_reviews">Reviews</string>
+    <string name="drawer_lists">Lists</string>
+    <string name="drawer_backloggd_settings">Backloggd Settings</string>
+    <string name="drawer_app_settings">App Settings</string>
+    <string name="drawer_login">Login</string>
+    <string name="drawer_logout">Logout</string>
+    <string name="drawer_about">About</string>
 </resources>

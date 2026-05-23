@@ -8,5 +8,18 @@
     <string name="nav_log_game">Spiel loggen</string>
     <string name="nav_search">Suche</string>
     <string name="nav_profile">Mein Profil</string>
+    <string name="nav_more">Mehr</string>
     <string name="login_required">Bitte melde dich an, um dein Profil zu sehen.</string>
+    <string name="fetching_username">Profil wird geladen…</string>
+    <string name="drawer_open">Menü öffnen</string>
+    <string name="drawer_close">Menü schließen</string>
+    <string name="drawer_notifications">Benachrichtigungen</string>
+    <string name="drawer_wishlist">Wunschliste</string>
+    <string name="drawer_reviews">Reviews</string>
+    <string name="drawer_lists">Listen</string>
+    <string name="drawer_backloggd_settings">Backloggd-Einstellungen</string>
+    <string name="drawer_app_settings">App-Einstellungen</string>
+    <string name="drawer_login">Anmelden</string>
+    <string name="drawer_logout">Abmelden</string>
+    <string name="drawer_about">Über</string>
 </resources>

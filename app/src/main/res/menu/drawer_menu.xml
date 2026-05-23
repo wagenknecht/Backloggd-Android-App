@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/drawer_group_main">
+        <item
+            android:id="@+id/drawer_notifications"
+            android:icon="@drawable/ic_drawer_notifications"
+            android:title="@string/drawer_notifications" />
+        <item
+            android:id="@+id/drawer_wishlist"
+            android:icon="@drawable/ic_drawer_wishlist"
+            android:title="@string/drawer_wishlist" />
+        <item
+            android:id="@+id/drawer_reviews"
+            android:icon="@drawable/ic_drawer_reviews"
+            android:title="@string/drawer_reviews" />
+        <item
+            android:id="@+id/drawer_lists"
+            android:icon="@drawable/ic_drawer_lists"
+            android:title="@string/drawer_lists" />
+    </group>
+    <group android:id="@+id/drawer_group_settings">
+        <item
+            android:id="@+id/drawer_backloggd_settings"
+            android:icon="@drawable/ic_drawer_settings"
+            android:title="@string/drawer_backloggd_settings" />
+        <item
+            android:id="@+id/drawer_app_settings"
+            android:icon="@drawable/ic_drawer_app_settings"
+            android:title="@string/drawer_app_settings" />
+    </group>
+    <group android:id="@+id/drawer_group_account">
+        <item
+            android:id="@+id/drawer_login"
+            android:icon="@drawable/ic_drawer_login"
+            android:title="@string/drawer_login" />
+        <item
+            android:id="@+id/drawer_logout"
+            android:icon="@drawable/ic_drawer_logout"
+            android:title="@string/drawer_logout" />
+        <item
+            android:id="@+id/drawer_about"
+            android:icon="@drawable/ic_drawer_about"
+            android:title="@string/drawer_about" />
+    </group>
+</menu>
