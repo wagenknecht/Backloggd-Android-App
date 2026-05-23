@@ -2,7 +2,6 @@ package de.wagenknecht.backloggd;
 
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_TAGS_API_URL;
-import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
 
 import android.Manifest;
@@ -108,12 +107,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                if (url.contains("backloggd.com")) {
+                Uri uri = request.getUrl();
+                if (isBackloggdHost(uri)) {
                     return false;
                 }
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
                 return true;
             }
@@ -231,13 +230,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private static boolean isBackloggdHost(Uri uri) {
+        String host = uri.getHost();
+        return "backloggd.com".equalsIgnoreCase(host) || "www.backloggd.com".equalsIgnoreCase(host);
+    }
+
     private void updateUiForUrl(String url) {
         Log.d(TAG, "Current URL: " + url);
-        if (url != null && url.startsWith(SETTINGS_URL)) {
+        if (url != null && isSettingsUrl(Uri.parse(url))) {
             settingsButton.setVisibility(View.VISIBLE);
         } else {
             settingsButton.setVisibility(View.GONE);
         }
+    }
+
+    private static boolean isSettingsUrl(Uri uri) {
+        if (!isBackloggdHost(uri)) {
+            return false;
+        }
+        String path = uri.getPath();
+        return path != null && (path.equals("/settings") || path.startsWith("/settings/"));
     }
 
     private void checkForUpdates() {
