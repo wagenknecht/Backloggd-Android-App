@@ -4,7 +4,6 @@ import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_REPO_URL;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_TAGS_API_URL;
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
-import static de.wagenknecht.backloggd.ApiConstants.LISTS_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGIN_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGOUT_URL;
 import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
@@ -366,10 +365,14 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav.setOnItemReselectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_log_game) {
+            if (id == R.id.nav_home) {
+                myWeb.loadUrl(BACKLOGGD_URL);
+            } else if (id == R.id.nav_log_game) {
                 myWeb.evaluateJavascript(LOG_GAME_JS, null);
             } else if (id == R.id.nav_search) {
                 triggerSearch();
+            } else if (id == R.id.nav_profile) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u));
             }
         });
     }
@@ -417,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.drawer_reviews) {
                 myWeb.loadUrl(REVIEWS_URL);
             } else if (id == R.id.drawer_lists) {
-                myWeb.loadUrl(LISTS_URL);
+                withUsername(username -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username + "/lists/"));
             } else if (id == R.id.drawer_backloggd_settings) {
                 myWeb.loadUrl(SETTINGS_URL);
             } else if (id == R.id.drawer_app_settings) {
@@ -454,8 +457,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (itemId != null && bottomNav.getSelectedItemId() != itemId) {
-            bottomNav.getMenu().findItem(itemId).setChecked(true);
+        android.view.Menu menu = bottomNav.getMenu();
+        if (itemId != null) {
+            if (bottomNav.getSelectedItemId() != itemId) {
+                menu.findItem(itemId).setChecked(true);
+            }
+        } else {
+            android.view.MenuItem current = menu.findItem(bottomNav.getSelectedItemId());
+            if (current != null && current.isChecked()) {
+                int groupId = current.getGroupId();
+                menu.setGroupCheckable(groupId, true, false);
+                current.setChecked(false);
+                menu.setGroupCheckable(groupId, true, true);
+            }
         }
     }
 
