@@ -4,4 +4,9 @@
     </string>
     <string name="retry">Erneut versuchen</string>
     <string name="settings">App Einstellungen</string>
+    <string name="nav_home">Start</string>
+    <string name="nav_log_game">Spiel loggen</string>
+    <string name="nav_search">Suche</string>
+    <string name="nav_profile">Mein Profil</string>
+    <string name="login_required">Bitte melde dich an, um dein Profil zu sehen.</string>
 </resources>

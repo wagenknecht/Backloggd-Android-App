@@ -12,3 +12,8 @@
 /captures
 .externalNativeBuild
 .cxx
+
+
+/.claude/
+/github-pages/node_modules/
+/github-pages/dist/

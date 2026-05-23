@@ -45,6 +45,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,8 +61,47 @@ public class MainActivity extends AppCompatActivity {
     private WebView myWeb;
     private LinearLayout errorLayout;
     private Button settingsButton;
+    private BottomNavigationView bottomNav;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
+
+    private static final String LOG_GAME_JS =
+            "(function(){var el=document.getElementById('add-a-game');if(el)el.click();})();";
+
+    private static final String INJECT_CSS_JS =
+            "(function(){" +
+            "if(document.getElementById('app-injected-style'))return;" +
+            "var s=document.createElement('style');" +
+            "s.id='app-injected-style';" +
+            "s.textContent='" +
+            ".navbar{display:none!important;}" +
+            "body.app-show-search .navbar{display:flex!important;}" +
+            "body.app-show-search .navbar-toggler{display:none!important;}" +
+            "body.app-show-search #navbarSupportedContent{display:block!important;height:auto!important;flex-basis:100%!important;}" +
+            "body.app-show-search .navbar-nav{display:none!important;}" +
+            "body.app-show-search #add-a-game{display:none!important;}" +
+            "body.app-show-search .navbar-brand{display:none!important;}" +
+            "';(document.head||document.documentElement).appendChild(s);" +
+            "})();";
+
+    private static final String SEARCH_JS =
+            "(function(){" +
+            "document.body.classList.add('app-show-search');" +
+            "var c=document.getElementById('navbarSupportedContent');" +
+            "if(c){c.classList.add('show');c.classList.remove('collapse');}" +
+            "setTimeout(function(){" +
+            "var sels=['#nav-bar-search','input.search-bar','input[name=\"query\"]','input[type=\"search\"]'];" +
+            "for(var i=0;i<sels.length;i++){var el=document.querySelector(sels[i]);" +
+            "if(el){" +
+            "el.scrollIntoView({block:'center'});" +
+            "el.focus();" +
+            "el.click();" +
+            "el.addEventListener('blur',function(){" +
+            "setTimeout(function(){document.body.classList.remove('app-show-search');},200);" +
+            "},{once:true});" +
+            "return;}}" +
+            "},50);" +
+            "})();";
 
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
@@ -78,16 +120,20 @@ public class MainActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_main);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
         myWeb = findViewById(R.id.myWeb);
         errorLayout = findViewById(R.id.errorLayout);
         settingsButton = findViewById(R.id.settingsButton);
+        bottomNav = findViewById(R.id.bottomNav);
         Button retryButton = findViewById(R.id.retryButton);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            bottomNav.setPadding(0, 0, 0, systemBars.bottom);
+            return insets;
+        });
+
+        setupBottomNav();
 
         myWeb.getSettings().setJavaScriptEnabled(true);
         myWeb.getSettings().setDomStorageEnabled(true);
@@ -141,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!receivedError) {
                     myWeb.setVisibility(View.VISIBLE);
                     errorLayout.setVisibility(View.GONE);
+                }
+                if (url != null && isBackloggdHost(Uri.parse(url))) {
+                    view.evaluateJavascript(INJECT_CSS_JS, null);
                 }
                 updateUiForUrl(url);
             }
@@ -241,6 +290,81 @@ public class MainActivity extends AppCompatActivity {
             settingsButton.setVisibility(View.VISIBLE);
         } else {
             settingsButton.setVisibility(View.GONE);
+        }
+        updateBottomNavSelection(url);
+    }
+
+    private void setupBottomNav() {
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                myWeb.loadUrl(BACKLOGGD_URL);
+                return true;
+            } else if (id == R.id.nav_log_game) {
+                myWeb.evaluateJavascript(LOG_GAME_JS, null);
+                return false;
+            } else if (id == R.id.nav_search) {
+                triggerSearch();
+                return false;
+            } else if (id == R.id.nav_profile) {
+                String username = PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("backloggd_username", null);
+                if (username != null && !username.isEmpty()) {
+                    myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username);
+                } else {
+                    Toast.makeText(this, R.string.login_required, Toast.LENGTH_SHORT).show();
+                    myWeb.loadUrl(BACKLOGGD_URL);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        bottomNav.setOnItemReselectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_log_game) {
+                myWeb.evaluateJavascript(LOG_GAME_JS, null);
+            } else if (id == R.id.nav_search) {
+                triggerSearch();
+            }
+        });
+    }
+
+    private void triggerSearch() {
+        myWeb.requestFocus();
+        myWeb.evaluateJavascript(SEARCH_JS, null);
+        myWeb.postDelayed(() -> {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(myWeb, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 150);
+    }
+
+    private void updateBottomNavSelection(String url) {
+        if (url == null || bottomNav == null) return;
+        Uri uri = Uri.parse(url);
+        if (!isBackloggdHost(uri)) return;
+
+        String path = uri.getPath();
+        if (path == null) path = "/";
+
+        Integer itemId = null;
+        if (path.equals("/") || path.isEmpty()) {
+            itemId = R.id.nav_home;
+        } else if (path.startsWith("/search")) {
+            itemId = R.id.nav_search;
+        } else if (path.startsWith("/u/")) {
+            String username = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("backloggd_username", null);
+            if (username != null && !username.isEmpty()
+                    && (path.equals("/u/" + username) || path.startsWith("/u/" + username + "/"))) {
+                itemId = R.id.nav_profile;
+            }
+        }
+
+        if (itemId != null && bottomNav.getSelectedItemId() != itemId) {
+            bottomNav.getMenu().findItem(itemId).setChecked(true);
         }
     }
 
