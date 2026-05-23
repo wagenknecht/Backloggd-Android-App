@@ -36,4 +36,20 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:key="debug_category"
+        app:title="Debug">
+
+        <Preference
+            app:key="debug_run_notification_worker"
+            app:title="Run Notification Check Now"
+            app:summary="Triggers NotificationCheckWorker as a one-time job" />
+
+        <Preference
+            app:key="debug_run_wishlist_worker"
+            app:title="Run Wishlist Check Now"
+            app:summary="Triggers WishlistCheckerWorker as a one-time job" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

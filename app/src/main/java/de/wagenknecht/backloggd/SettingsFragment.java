@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,17 +16,20 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import de.wagenknecht.backloggd.BuildConfig;
 import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
 import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
 
@@ -83,6 +87,39 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 requireActivity().finish();
+                return true;
+            });
+        }
+
+        setupDebugCategory();
+    }
+
+    private void setupDebugCategory() {
+        PreferenceCategory debugCategory = findPreference("debug_category");
+        if (debugCategory == null) {
+            return;
+        }
+        if (!BuildConfig.DEBUG) {
+            getPreferenceScreen().removePreference(debugCategory);
+            return;
+        }
+
+        Preference runNotif = findPreference("debug_run_notification_worker");
+        if (runNotif != null) {
+            runNotif.setOnPreferenceClickListener(p -> {
+                WorkManager.getInstance(requireContext()).enqueue(
+                        new OneTimeWorkRequest.Builder(NotificationCheckWorker.class).build());
+                Toast.makeText(requireContext(), "NotificationCheckWorker enqueued", Toast.LENGTH_SHORT).show();
+                return true;
+            });
+        }
+
+        Preference runWishlist = findPreference("debug_run_wishlist_worker");
+        if (runWishlist != null) {
+            runWishlist.setOnPreferenceClickListener(p -> {
+                WorkManager.getInstance(requireContext()).enqueue(
+                        new OneTimeWorkRequest.Builder(WishlistCheckerWorker.class).build());
+                Toast.makeText(requireContext(), "WishlistCheckerWorker enqueued", Toast.LENGTH_SHORT).show();
                 return true;
             });
         }

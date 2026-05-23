@@ -1,7 +1,6 @@
 package de.wagenknecht.backloggd.worker;
 
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
-import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
 import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
 
 import android.Manifest;
@@ -13,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
@@ -30,15 +28,11 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -46,9 +40,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import de.wagenknecht.backloggd.ApiConstants;
 import de.wagenknecht.backloggd.MainActivity;
 import de.wagenknecht.backloggd.R;
+import de.wagenknecht.backloggd.util.BackloggdRequest;
+import de.wagenknecht.backloggd.util.ImageDownloader;
 
 public class WishlistCheckerWorker extends Worker {
 
@@ -67,19 +62,19 @@ public class WishlistCheckerWorker extends Worker {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String username = prefs.getString("backloggd_username", null);
 
+        String cookies = CookieManager.getInstance().getCookie(BACKLOGGD_URL);
 
         if (username == null || username.isEmpty()) {
             Log.d(TAG, "Username not found, trying to fetch from settings page.");
 
-            String cookies = CookieManager.getInstance().getCookie(NOTIFICATION_URL);
             if (cookies == null || cookies.isEmpty()) {
                 Log.w(TAG, "Could not get cookies. User is probably not logged in. Aborting.");
                 return Result.success();
             }
 
             try {
-                Connection.Response response = Jsoup.connect(SETTINGS_URL)
-                        .header("Cookie", cookies)
+                Connection.Response response = BackloggdRequest
+                        .forUrl(getApplicationContext(), SETTINGS_URL, cookies)
                         .execute();
                 if (response.statusCode() == 404) {
                     Log.w(TAG, "User not logged in, settings page returned 404. Retrying in 30 minutes.");
@@ -108,7 +103,16 @@ public class WishlistCheckerWorker extends Worker {
         String wishlistUrl = BACKLOGGD_URL + "/u/" + username + "/wishlist/release/type:wishlist;release_year:" + currentYear;
 
         try {
-            Document doc = Jsoup.connect(wishlistUrl).get();
+            Connection.Response wishlistResponse = BackloggdRequest
+                    .forUrl(getApplicationContext(), wishlistUrl, cookies)
+                    .execute();
+            int statusCode = wishlistResponse.statusCode();
+            if (statusCode != 200) {
+                Log.w(TAG, "Wishlist request returned status " + statusCode + ". Body excerpt: "
+                        + wishlistResponse.body().substring(0, Math.min(500, wishlistResponse.body().length())));
+                return Result.retry();
+            }
+            Document doc = wishlistResponse.parse();
             Elements gameElements = doc.select("#user-games-library-container .rating-hover");
 
             if (gameElements.isEmpty()) {
@@ -129,7 +133,7 @@ public class WishlistCheckerWorker extends Worker {
 
                         if (!releaseDateStr.equals(storedDate)) {
                             Log.d(TAG, "Found game releasing today: " + gameTitle);
-                            Bitmap gameCoverBitmap = getBitmapFromUrl(imageUrl);
+                            Bitmap gameCoverBitmap = ImageDownloader.downloadDownsampled(imageUrl);
                             showPushNotification("Releasing Today!", gameTitle + " is out now!", gameTitle, gameCoverBitmap);
                             releasePrefs.edit().putString(gameTitle, releaseDateStr).apply();
                         } else {
@@ -145,20 +149,6 @@ public class WishlistCheckerWorker extends Worker {
 
         scheduleNextWorker(getApplicationContext());
         return Result.success();
-    }
-
-    private Bitmap getBitmapFromUrl(String imageUrl) {
-        try {
-            URL url = new URL(imageUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            return BitmapFactory.decodeStream(input);
-        } catch (IOException e) {
-            Log.e(TAG, "Error downloading image for notification", e);
-            return null;
-        }
     }
 
     private boolean isReleasedToday(String releaseDateStr) {

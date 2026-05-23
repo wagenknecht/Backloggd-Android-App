@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
@@ -22,18 +21,15 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import org.jsoup.Jsoup;
+import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import de.wagenknecht.backloggd.ApiConstants;
 import de.wagenknecht.backloggd.MainActivity;
 import de.wagenknecht.backloggd.R;
+import de.wagenknecht.backloggd.util.BackloggdRequest;
+import de.wagenknecht.backloggd.util.ImageDownloader;
 
 public class NotificationCheckWorker extends Worker {
 
@@ -56,9 +52,16 @@ public class NotificationCheckWorker extends Worker {
         }
 
         try {
-            Document doc = Jsoup.connect(NOTIFICATION_URL)
-                    .header("Cookie", cookies)
-                    .get();
+            Connection.Response response = BackloggdRequest
+                    .forUrl(getApplicationContext(), NOTIFICATION_URL, cookies)
+                    .execute();
+            int statusCode = response.statusCode();
+            if (statusCode != 200) {
+                Log.w(TAG, "Notifications request returned status " + statusCode + ". Body excerpt: "
+                        + response.body().substring(0, Math.min(500, response.body().length())));
+                return Result.retry();
+            }
+            Document doc = response.parse();
 
             Elements unreadNotifications = doc.select(".notification.unread");
 
@@ -81,7 +84,7 @@ public class NotificationCheckWorker extends Worker {
 
                     Bitmap image = null;
                     if (imageUrl != null && !imageUrl.isEmpty()) {
-                        image = getBitmapFromUrl(imageUrl);
+                        image = ImageDownloader.downloadDownsampled(imageUrl);
                     }
 
                     if (!notificationText.isEmpty()) {
@@ -97,20 +100,6 @@ public class NotificationCheckWorker extends Worker {
         } catch (Exception e) {
             Log.e(TAG, "Failed to fetch or parse notifications page.", e);
             return Result.failure();
-        }
-    }
-
-    private Bitmap getBitmapFromUrl(String imageUrl) {
-        try {
-            URL url = new URL(imageUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            return BitmapFactory.decodeStream(input);
-        } catch (Exception e) {
-            Log.e(TAG, "Error downloading notification image", e);
-            return null;
         }
     }
 
