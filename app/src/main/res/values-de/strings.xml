@@ -6,4 +6,5 @@
     <string name="settings">App Einstellungen</string>
     <string name="login_required">Bitte melde dich an, um dein Profil zu sehen.</string>
     <string name="fetching_username">Profil wird geladen…</string>
+    <string name="feedback_no_email_app">Keine E-Mail-App installiert.</string>
 </resources>

@@ -457,11 +457,18 @@ public class MainActivity extends AppCompatActivity {
                 myWeb.loadUrl(BACKLOGGD_URL + "/settings/");
             } else if (id == R.id.drawer_app_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
-            } else if (id == R.id.drawer_login) {
-                myWeb.loadUrl(LOGIN_URL);
             } else if (id == R.id.drawer_logout) {
                 UsernameHelper.clearCached(this);
                 myWeb.loadUrl(LOGOUT_URL);
+            } else if (id == R.id.drawer_feedback) {
+                Intent feedback = new Intent(Intent.ACTION_SENDTO,
+                        Uri.parse("mailto:dev.wagenknecht@gmail.com"));
+                feedback.putExtra(Intent.EXTRA_SUBJECT, "Backloggd");
+                try {
+                    startActivity(feedback);
+                } catch (android.content.ActivityNotFoundException e) {
+                    Toast.makeText(this, R.string.feedback_no_email_app, Toast.LENGTH_SHORT).show();
+                }
             } else if (id == R.id.drawer_about) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_REPO_URL)));
             }

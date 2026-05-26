@@ -66,15 +66,15 @@
     </group>
     <group android:id="@+id/drawer_group_account">
         <item
-            android:id="@+id/drawer_login"
-            android:icon="@drawable/ic_drawer_login"
-            android:title="@string/drawer_login" />
-        <item
             android:id="@+id/drawer_logout"
             android:icon="@drawable/ic_drawer_logout"
             android:title="@string/drawer_logout" />
     </group>
     <group android:id="@+id/drawer_group_about">
+        <item
+                android:id="@+id/drawer_feedback"
+                android:icon="@drawable/ic_drawer_feedback"
+                android:title="@string/drawer_feedback" />
         <item
             android:id="@+id/drawer_about"
             android:icon="@drawable/ic_drawer_about"
