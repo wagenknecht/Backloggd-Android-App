@@ -71,7 +71,6 @@ import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
 public class MainActivity extends AppCompatActivity {
     private WebView myWeb;
     private LinearLayout errorLayout;
-    private Button settingsButton;
     private BottomNavigationView bottomNav;
     private DrawerLayout drawerLayout;
     private NavigationView drawerNav;
@@ -137,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
 
         myWeb = findViewById(R.id.myWeb);
         errorLayout = findViewById(R.id.errorLayout);
-        settingsButton = findViewById(R.id.settingsButton);
         bottomNav = findViewById(R.id.bottomNav);
         drawerLayout = findViewById(R.id.drawerLayout);
         drawerNav = findViewById(R.id.drawerNav);
@@ -165,11 +163,6 @@ public class MainActivity extends AppCompatActivity {
             myWeb.setVisibility(View.VISIBLE);
             errorLayout.setVisibility(View.GONE);
             myWeb.reload();
-        });
-
-        settingsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
         });
 
         myWeb.setWebViewClient(new WebViewClient() {
@@ -356,11 +349,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUiForUrl(String url) {
         Log.d(TAG, "Current URL: " + url);
-        if (url != null && isSettingsUrl(Uri.parse(url))) {
-            settingsButton.setVisibility(View.VISIBLE);
-        } else {
-            settingsButton.setVisibility(View.GONE);
-        }
         updateBottomNavSelection(url);
     }
 
@@ -520,14 +508,6 @@ public class MainActivity extends AppCompatActivity {
                 menu.setGroupCheckable(groupId, true, true);
             }
         }
-    }
-
-    private static boolean isSettingsUrl(Uri uri) {
-        if (!isBackloggdHost(uri)) {
-            return false;
-        }
-        String path = uri.getPath();
-        return path != null && (path.equals("/settings") || path.startsWith("/settings/"));
     }
 
     private void checkForUpdates() {

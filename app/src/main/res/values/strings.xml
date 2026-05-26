@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">Backloggd</string>
     <string name="error_loading_page">Error loading page.\nPlease check your internet connection.</string>
     <string name="retry">Retry</string>
-    <string name="settings">app settings</string>
     <string name="nav_home">Home</string>
     <string name="nav_log_game">Log a game</string>
     <string name="nav_search">Search</string>
