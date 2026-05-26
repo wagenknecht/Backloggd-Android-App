@@ -39,6 +39,10 @@ public final class UsernameHelper {
         return (u == null || u.isEmpty()) ? null : u;
     }
 
+    public static void clearCached(@NonNull Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().remove(PREF_KEY).apply();
+    }
+
     @WorkerThread
     @Nullable
     public static String fetchSync(@NonNull Context context) {

@@ -24,6 +24,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/pageProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:visibility="gone"
+                app:indicatorColor="@color/back_pink"
+                app:trackColor="@android:color/transparent"
+                app:trackThickness="3dp" />
+
             <LinearLayout
                 android:id="@+id/errorLayout"
                 android:layout_width="match_parent"

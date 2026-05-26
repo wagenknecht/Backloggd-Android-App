@@ -21,6 +21,7 @@ import android.os.Bundle;
 import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -53,6 +54,7 @@ import com.android.volley.toolbox.Volley;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
     private DrawerLayout drawerLayout;
     private NavigationView drawerNav;
+    private LinearProgressIndicator pageProgress;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
 
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
         drawerLayout = findViewById(R.id.drawerLayout);
         drawerNav = findViewById(R.id.drawerNav);
+        pageProgress = findViewById(R.id.pageProgress);
         Button retryButton = findViewById(R.id.retryButton);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -210,6 +214,20 @@ public class MainActivity extends AppCompatActivity {
             public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
                 super.doUpdateVisitedHistory(view, url, isReload);
                 updateUiForUrl(url);
+            }
+        });
+
+        myWeb.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int progress) {
+                if (progress < 100) {
+                    if (pageProgress.getVisibility() != View.VISIBLE) {
+                        pageProgress.setVisibility(View.VISIBLE);
+                    }
+                    pageProgress.setProgressCompat(progress, true);
+                } else {
+                    pageProgress.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -442,6 +460,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.drawer_login) {
                 myWeb.loadUrl(LOGIN_URL);
             } else if (id == R.id.drawer_logout) {
+                UsernameHelper.clearCached(this);
                 myWeb.loadUrl(LOGOUT_URL);
             } else if (id == R.id.drawer_about) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_REPO_URL)));
