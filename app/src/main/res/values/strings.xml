@@ -13,9 +13,17 @@
     <string name="drawer_open">Open menu</string>
     <string name="drawer_close">Close menu</string>
     <string name="drawer_notifications">Notifications</string>
+    <string name="drawer_played">Played</string>
+    <string name="drawer_playing">Playing</string>
+    <string name="drawer_backlog">Backlog</string>
     <string name="drawer_wishlist">Wishlist</string>
+    <string name="drawer_journal">Journal</string>
+    <string name="drawer_activity">Activity</string>
     <string name="drawer_reviews">Reviews</string>
     <string name="drawer_lists">Lists</string>
+    <string name="drawer_friends">Friends</string>
+    <string name="drawer_likes">Likes</string>
+    <string name="drawer_stats">Stats</string>
     <string name="drawer_backloggd_settings">Backloggd Settings</string>
     <string name="drawer_app_settings">App Settings</string>
     <string name="drawer_login">Login</string>

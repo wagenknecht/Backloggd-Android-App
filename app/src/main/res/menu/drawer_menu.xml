@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/drawer_group_main">
+    <group android:id="@+id/drawer_group_notifications">
         <item
             android:id="@+id/drawer_notifications"
             android:icon="@drawable/ic_drawer_notifications"
             android:title="@string/drawer_notifications" />
+    </group>
+    <group android:id="@+id/drawer_group_library">
+        <item
+            android:id="@+id/drawer_played"
+            android:icon="@drawable/ic_drawer_played"
+            android:title="@string/drawer_played" />
+        <item
+            android:id="@+id/drawer_playing"
+            android:icon="@drawable/ic_drawer_playing"
+            android:title="@string/drawer_playing" />
+        <item
+            android:id="@+id/drawer_backlog"
+            android:icon="@drawable/ic_drawer_backlog"
+            android:title="@string/drawer_backlog" />
         <item
             android:id="@+id/drawer_wishlist"
             android:icon="@drawable/ic_drawer_wishlist"
             android:title="@string/drawer_wishlist" />
+    </group>
+    <group android:id="@+id/drawer_group_activity">
+        <item
+            android:id="@+id/drawer_journal"
+            android:icon="@drawable/ic_drawer_journal"
+            android:title="@string/drawer_journal" />
+        <item
+            android:id="@+id/drawer_activity"
+            android:icon="@drawable/ic_drawer_activity"
+            android:title="@string/drawer_activity" />
         <item
             android:id="@+id/drawer_reviews"
             android:icon="@drawable/ic_drawer_reviews"
@@ -17,6 +41,18 @@
             android:id="@+id/drawer_lists"
             android:icon="@drawable/ic_drawer_lists"
             android:title="@string/drawer_lists" />
+        <item
+            android:id="@+id/drawer_friends"
+            android:icon="@drawable/ic_drawer_friends"
+            android:title="@string/drawer_friends" />
+        <item
+            android:id="@+id/drawer_likes"
+            android:icon="@drawable/ic_drawer_likes"
+            android:title="@string/drawer_likes" />
+        <item
+            android:id="@+id/drawer_stats"
+            android:icon="@drawable/ic_drawer_stats"
+            android:title="@string/drawer_stats" />
     </group>
     <group android:id="@+id/drawer_group_settings">
         <item
@@ -37,6 +73,8 @@
             android:id="@+id/drawer_logout"
             android:icon="@drawable/ic_drawer_logout"
             android:title="@string/drawer_logout" />
+    </group>
+    <group android:id="@+id/drawer_group_about">
         <item
             android:id="@+id/drawer_about"
             android:icon="@drawable/ic_drawer_about"

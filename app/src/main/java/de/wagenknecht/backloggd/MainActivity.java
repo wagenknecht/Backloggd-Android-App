@@ -7,8 +7,6 @@ import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGIN_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGOUT_URL;
 import static de.wagenknecht.backloggd.ApiConstants.NOTIFICATION_URL;
-import static de.wagenknecht.backloggd.ApiConstants.REVIEWS_URL;
-import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -415,14 +413,30 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.drawer_notifications) {
                 myWeb.loadUrl(NOTIFICATION_URL);
+            } else if (id == R.id.drawer_played) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/games/"));
+            } else if (id == R.id.drawer_playing) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/playing/"));
+            } else if (id == R.id.drawer_backlog) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/backlog/"));
             } else if (id == R.id.drawer_wishlist) {
-                withUsername(username -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username + "/wishlist"));
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/wishlist/"));
+            } else if (id == R.id.drawer_journal) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/journal/"));
+            } else if (id == R.id.drawer_activity) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/activity/"));
             } else if (id == R.id.drawer_reviews) {
-                myWeb.loadUrl(REVIEWS_URL);
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/reviews/"));
             } else if (id == R.id.drawer_lists) {
-                withUsername(username -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + username + "/lists/"));
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/lists/"));
+            } else if (id == R.id.drawer_friends) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/following/"));
+            } else if (id == R.id.drawer_likes) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/likes/"));
+            } else if (id == R.id.drawer_stats) {
+                withUsername(u -> myWeb.loadUrl(BACKLOGGD_URL + "/u/" + u + "/stats/"));
             } else if (id == R.id.drawer_backloggd_settings) {
-                myWeb.loadUrl(SETTINGS_URL);
+                myWeb.loadUrl(BACKLOGGD_URL + "/settings/");
             } else if (id == R.id.drawer_app_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (id == R.id.drawer_login) {
