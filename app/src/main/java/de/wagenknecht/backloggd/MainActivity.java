@@ -52,6 +52,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView drawerNav;
     private LinearProgressIndicator pageProgress;
+    private SwipeRefreshLayout swipeRefresh;
     private boolean receivedError = false;
     private static final String TAG = "MainActivity";
 
@@ -140,7 +142,12 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawerLayout);
         drawerNav = findViewById(R.id.drawerNav);
         pageProgress = findViewById(R.id.pageProgress);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
         Button retryButton = findViewById(R.id.retryButton);
+
+        swipeRefresh.setColorSchemeResources(R.color.back_pink);
+        swipeRefresh.setProgressBackgroundColorSchemeResource(R.color.back_secondary);
+        swipeRefresh.setOnRefreshListener(() -> myWeb.reload());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -194,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     receivedError = true;
                     myWeb.setVisibility(View.GONE);
                     errorLayout.setVisibility(View.VISIBLE);
+                    swipeRefresh.setRefreshing(false);
                 }
             }
 
@@ -208,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     view.evaluateJavascript(INJECT_CSS_JS, null);
                 }
                 updateUiForUrl(url);
+                swipeRefresh.setRefreshing(false);
             }
 
             @Override

@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.preference)
     implementation(libs.volley)
     implementation(libs.work.runtime)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.jsoup)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

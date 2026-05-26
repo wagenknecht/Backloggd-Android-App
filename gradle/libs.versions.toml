@@ -11,6 +11,7 @@ constraintlayout = "2.2.1"
 preference = "1.2.1"
 volley = "1.2.1"
 workRuntime = "2.11.0"
+swiperefreshlayout = "1.1.0"
 
 [libraries]
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
@@ -24,6 +25,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 preference = { module = "androidx.preference:preference", version.ref = "preference" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
+swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
