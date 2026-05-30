@@ -9,6 +9,13 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 import { useI18n } from "@/lib/i18n"
 import { LanguageToggle } from "@/components/LanguageToggle"
 
+const screenshots = [
+  { src: "navbar.webm", captionKey: "screenshots.caption.navbar" },
+  { src: "sidebar.webm", captionKey: "screenshots.caption.sidebar" },
+  { src: "quick-search.webm", captionKey: "screenshots.caption.quicksearch" },
+  { src: "screenshot2.png", captionKey: "screenshots.caption.notifications" },
+] as const
+
 function App() {
   const { t } = useI18n()
   return (
@@ -88,25 +95,27 @@ function App() {
         {/* Mobile: Horizontal Scroll */}
         <div className="sm:hidden">
           <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div key={num} className="flex-shrink-0 w-[180px] snap-center">
+            {screenshots.map(({ src, captionKey }) => (
+              <div key={src} className="flex-shrink-0 w-[260px] snap-center">
                 <ScreenshotCard
-                  src={`${import.meta.env.BASE_URL}screenshot${num}.png`}
-                  alt={`Backloggd App Screenshot ${num}`}
+                  src={`${import.meta.env.BASE_URL}${src}`}
+                  alt={t(captionKey)}
+                  caption={t(captionKey)}
                   compact={true}
                 />
               </div>
             ))}
           </div>
         </div>
-        
+
         {/* Desktop: Grid */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          {[1, 2, 3, 4, 5, 6].map((num) => (
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
+          {screenshots.map(({ src, captionKey }) => (
             <ScreenshotCard
-              key={num}
-              src={`${import.meta.env.BASE_URL}screenshot${num}.png`}
-              alt={`Backloggd App Screenshot ${num}`}
+              key={src}
+              src={`${import.meta.env.BASE_URL}${src}`}
+              alt={t(captionKey)}
+              caption={t(captionKey)}
             />
           ))}
         </div>

@@ -31,8 +31,12 @@ const de: Translations = {
   "hero.cta.github": "GitHub",
 
   // Screenshots section
-  "screenshots.title": "App Screenshots",
-  "screenshots.subtitle": "Sieh dir die App in Aktion an",
+  "screenshots.title": "Die App in Aktion",
+  "screenshots.subtitle": "Wichtige Interaktionen auf einen Blick",
+  "screenshots.caption.navbar": "Navigationsleiste",
+  "screenshots.caption.sidebar": "Seitenmenü",
+  "screenshots.caption.quicksearch": "Schnell-Log & Suche",
+  "screenshots.caption.notifications": "Native Android-Benachrichtigungen",
 
   // Features section
   "features.title": "App Features",
@@ -90,8 +94,12 @@ const en: Translations = {
   "hero.cta.github": "GitHub",
 
   // Screenshots section
-  "screenshots.title": "App Screenshots",
-  "screenshots.subtitle": "See the app in action",
+  "screenshots.title": "The App in Action",
+  "screenshots.subtitle": "Key interactions at a glance",
+  "screenshots.caption.navbar": "Navigation Bar",
+  "screenshots.caption.sidebar": "Side Drawer",
+  "screenshots.caption.quicksearch": "Quick Log & Search",
+  "screenshots.caption.notifications": "Native Android Notifications",
 
   // Features section
   "features.title": "App Features",
@@ -146,8 +154,12 @@ const es: Translations = {
   "hero.cta.download_now": "Descargar ahora",
   "hero.cta.github": "GitHub",
 
-  "screenshots.title": "Capturas de la app",
-  "screenshots.subtitle": "Mira la app en acción",
+  "screenshots.title": "La app en acción",
+  "screenshots.subtitle": "Interacciones clave de un vistazo",
+  "screenshots.caption.navbar": "Barra de navegación",
+  "screenshots.caption.sidebar": "Menú lateral",
+  "screenshots.caption.quicksearch": "Registro y búsqueda rápidos",
+  "screenshots.caption.notifications": "Notificaciones nativas de Android",
 
   "features.title": "Funciones de la app",
   "features.subtitle": "Funciones avanzadas para tu biblioteca de Backloggd",
@@ -199,8 +211,12 @@ const fr: Translations = {
   "hero.cta.download_now": "Télécharger maintenant",
   "hero.cta.github": "GitHub",
 
-  "screenshots.title": "Captures d’écran de l’app",
-  "screenshots.subtitle": "Voir l’app en action",
+  "screenshots.title": "L’app en action",
+  "screenshots.subtitle": "Aperçu des interactions clés",
+  "screenshots.caption.navbar": "Barre de navigation",
+  "screenshots.caption.sidebar": "Menu latéral",
+  "screenshots.caption.quicksearch": "Journal et recherche rapides",
+  "screenshots.caption.notifications": "Notifications Android natives",
 
   "features.title": "Fonctionnalités de l’app",
   "features.subtitle": "Fonctionnalités avancées pour votre bibliothèque Backloggd",
