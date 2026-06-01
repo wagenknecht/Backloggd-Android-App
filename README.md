@@ -4,7 +4,7 @@
 [![Closed Issues Badge](https://img.shields.io/github/issues-closed/wagenknecht/backloggd-android-app?color=%238256d0&style=for-the-badge)](https://github.com/wagenknecht/backloggd-android-app/issues?q=is%3Aissue+is%3Aclosed)<br>
 This is an Android application for the website [backloggd.com](https://backloggd.com). It provides a native-feeling experience with its own navigation, improved UI/UX, and integrated Android features.
 
-[**Download latest version here**](https://github.com/wagenknecht/Backloggd-Android-App/releases/download/2.0/backloggd.apk)
+[**Download latest version here**](https://github.com/wagenknecht/Backloggd-Android-App/releases/latest/download/backloggd.apk)
 
 ## Features
 
