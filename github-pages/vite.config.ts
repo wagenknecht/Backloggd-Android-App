@@ -5,7 +5,7 @@ import path from 'node:path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/Backloggd-Android-App/',
+  base: '/backloggd-android-app/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
