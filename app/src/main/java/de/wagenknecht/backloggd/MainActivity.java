@@ -2,7 +2,6 @@ package de.wagenknecht.backloggd;
 
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_REPO_URL;
-import static de.wagenknecht.backloggd.ApiConstants.GITHUB_LATEST_RELEASE_API_URL;
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGIN_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGOUT_URL;
@@ -13,7 +12,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -33,6 +31,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -47,10 +46,6 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -61,6 +56,7 @@ import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
 
+import de.wagenknecht.backloggd.util.UpdateChecker;
 import de.wagenknecht.backloggd.util.UsernameHelper;
 import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
 import de.wagenknecht.backloggd.worker.WishlistCheckerWorker;
@@ -171,13 +167,7 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                try {
-                    startActivity(intent);
-                } catch (android.content.ActivityNotFoundException e) {
-                    Log.w(TAG, "No app can handle " + uri, e);
-                    Toast.makeText(MainActivity.this, R.string.no_app_for_link, Toast.LENGTH_SHORT).show();
-                }
+                openExternally(uri);
                 return true;
             }
 
@@ -248,7 +238,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        checkForUpdates();
+        // Only on a fresh start, so a rotation does not check again.
+        if (savedInstanceState == null) {
+            UpdateChecker.checkAsync(this, this::showUpdateDialog);
+        }
         askNotificationPermission();
         startNotificationWorker();
         WishlistCheckerWorker.scheduleNextWorker(this);
@@ -512,102 +505,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkForUpdates() {
-        String currentVersion = getCurrentVersionName(this);
-        if (currentVersion == null) {
-            return;
-        }
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, GITHUB_LATEST_RELEASE_API_URL, null,
-                response -> {
-                    String latestVersion = response.optString("tag_name", "");
-                    if (latestVersion.isEmpty()) {
-                        Log.w(TAG, "Latest release has no tag_name, skipping update check.");
-                        return;
-                    }
-
-                    Log.d(TAG, "Latest release on GitHub: " + latestVersion);
-                    Log.d(TAG, "Current app version: " + currentVersion);
-
-                    if (isNewerVersion(latestVersion, currentVersion)) {
-                        showUpdateDialog(latestVersion);
-                    }
-                },
-                error -> Log.e(TAG, "Error checking for updates", error)
-        );
-        queue.add(request);
-    }
-
     /**
-     * Compares dot-separated version numbers, tolerating an optional "v" prefix and a differing
-     * number of segments ("2.1" counts as newer than "2.0.3"). Only a strictly newer remote
-     * version returns true, so locally built versions ahead of the last release stay quiet.
+     * @param apkUrl direct link to the release's APK, or null to fall back to the releases page.
      */
-    private static boolean isNewerVersion(String remote, String local) {
-        String[] remoteParts = stripVersionPrefix(remote).split("\\.");
-        String[] localParts = stripVersionPrefix(local).split("\\.");
-        int segments = Math.max(remoteParts.length, localParts.length);
-        for (int i = 0; i < segments; i++) {
-            int remotePart = versionPart(remoteParts, i);
-            int localPart = versionPart(localParts, i);
-            if (remotePart != localPart) {
-                return remotePart > localPart;
-            }
-        }
-        return false;
-    }
-
-    private static String stripVersionPrefix(String version) {
-        String trimmed = version.trim();
-        if (trimmed.startsWith("v") || trimmed.startsWith("V")) {
-            return trimmed.substring(1);
-        }
-        return trimmed;
-    }
-
-    /** Leading digits of the given segment, or 0 for a missing or non-numeric one. */
-    private static int versionPart(String[] parts, int index) {
-        if (index >= parts.length) {
-            return 0;
-        }
-        String part = parts[index].trim();
-        int end = 0;
-        while (end < part.length() && Character.isDigit(part.charAt(end))) {
-            end++;
-        }
-        if (end == 0) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(part.substring(0, end));
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private void showUpdateDialog(String newVersion) {
+    private void showUpdateDialog(String newVersion, @Nullable String apkUrl) {
         if (isFinishing() || isDestroyed()) {
             return;
         }
+        String downloadUrl = apkUrl != null ? apkUrl : GITHUB_RELEASES_LATEST;
         new AlertDialog.Builder(this)
                 .setTitle(R.string.update_available_title)
                 .setMessage(getString(R.string.update_available_message, newVersion))
-                .setPositiveButton(R.string.update_download, (dialog, which) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_LATEST));
-                    startActivity(browserIntent);
-                })
+                .setPositiveButton(R.string.update_download,
+                        (dialog, which) -> openExternally(Uri.parse(downloadUrl)))
                 .setNegativeButton(R.string.update_later, null)
                 .show();
     }
 
-    private String getCurrentVersionName(Context context) {
+    /** Hands a URI to another app, telling the user when nothing can handle it. */
+    private void openExternally(Uri uri) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Could not get package name", e);
-            return null;
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (android.content.ActivityNotFoundException e) {
+            Log.w(TAG, "No app can handle " + uri, e);
+            Toast.makeText(this, R.string.no_app_for_link, Toast.LENGTH_SHORT).show();
         }
     }
 }

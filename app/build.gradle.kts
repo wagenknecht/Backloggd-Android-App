@@ -48,7 +48,6 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.preference)
-    implementation(libs.volley)
     implementation(libs.work.runtime)
     implementation(libs.swiperefreshlayout)
     implementation(libs.jsoup)
