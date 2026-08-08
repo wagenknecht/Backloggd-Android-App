@@ -13,7 +13,7 @@ public final class ApiConstants {
     public static final String LOGIN_URL = BACKLOGGD_URL + "/login";
     public static final String LOGOUT_URL = BACKLOGGD_URL + "/users/sign_out";
     public static final String GITHUB_RELEASES_LATEST = "https://github.com/wagenknecht/Backloggd-Android-App/releases/latest";
-    public static final String GITHUB_TAGS_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/tags";
+    public static final String GITHUB_LATEST_RELEASE_API_URL = "https://api.github.com/repos/wagenknecht/Backloggd-Android-App/releases/latest";
     public static final String GITHUB_REPO_URL = "https://github.com/wagenknecht/Backloggd-Android-App";
 
 

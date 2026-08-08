@@ -28,5 +28,20 @@
     <string name="drawer_logout">Logout</string>
     <string name="drawer_feedback">App Feedback</string>
     <string name="feedback_no_email_app">No email app installed.</string>
+    <string name="no_app_for_link">No app found to open this link.</string>
     <string name="drawer_about">About</string>
+    <string name="update_available_title">Update Available</string>
+    <string name="update_available_message">A new version (%1$s) is available. Would you like to download it?</string>
+    <string name="update_download">Download</string>
+    <string name="update_later">Later</string>
+    <string name="notification_channel_name">Backloggd Notifications</string>
+    <string name="notification_channel_description">Channel for new backloggd.com notifications</string>
+    <string name="notification_title_badge">New Badge</string>
+    <string name="notification_title_follower">New Follower</string>
+    <string name="notification_title_like">New Like</string>
+    <string name="notification_title_default">Backloggd</string>
+    <string name="wishlist_channel_name">Wishlist Game Releases</string>
+    <string name="wishlist_channel_description">Notifications for when games on your wishlist get a release date.</string>
+    <string name="wishlist_notification_title">Releasing Today!</string>
+    <string name="wishlist_notification_message">%1$s is out now!</string>
 </resources>

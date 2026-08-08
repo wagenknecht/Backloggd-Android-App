@@ -31,7 +31,7 @@ This is an Android application for the website [backloggd.com](https://backloggd
 ### Quick Log & Search
 ![Quick search demo](.github/readme-assets/quick-search.gif)
 
-To install the app, download the latest APK from the [releases page](https://github.com/wagenknecht/backloggd/releases) and install it on your Android device.
+To install the app, download the latest APK from the [releases page](https://github.com/wagenknecht/Backloggd-Android-App/releases) and install it on your Android device.
 
 ## Usage
 

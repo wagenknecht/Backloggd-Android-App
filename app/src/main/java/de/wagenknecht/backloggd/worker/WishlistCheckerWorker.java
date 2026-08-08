@@ -134,7 +134,12 @@ public class WishlistCheckerWorker extends Worker {
                         if (!releaseDateStr.equals(storedDate)) {
                             Log.d(TAG, "Found game releasing today: " + gameTitle);
                             Bitmap gameCoverBitmap = ImageDownloader.downloadDownsampled(imageUrl);
-                            showPushNotification("Releasing Today!", gameTitle + " is out now!", gameTitle, gameCoverBitmap);
+                            Context appContext = getApplicationContext();
+                            showPushNotification(
+                                    appContext.getString(R.string.wishlist_notification_title),
+                                    appContext.getString(R.string.wishlist_notification_message, gameTitle),
+                                    gameTitle,
+                                    gameCoverBitmap);
                             releasePrefs.edit().putString(gameTitle, releaseDateStr).apply();
                         } else {
                             Log.d(TAG, "Already notified for today's release of " + gameTitle);
@@ -208,8 +213,8 @@ public class WishlistCheckerWorker extends Worker {
 
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Wishlist Game Releases";
-            String description = "Notifications for when games on your wishlist get a release date.";
+            CharSequence name = context.getString(R.string.wishlist_channel_name);
+            String description = context.getString(R.string.wishlist_channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

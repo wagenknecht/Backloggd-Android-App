@@ -71,16 +71,17 @@ public class NotificationCheckWorker extends Worker {
                     String notificationText = notification.select(".notification-body p").text();
                     String imageUrl = notification.select(".avatar img").attr("src");
                     String iconClass = notification.select(".notification-icon i").attr("class");
-                    String title;
+                    int titleRes;
                     if (iconClass.contains("fa-star")) {
-                        title = "New Badge";
+                        titleRes = R.string.notification_title_badge;
                     } else if (iconClass.contains("fa-user-friends")) {
-                        title = "New Follower";
+                        titleRes = R.string.notification_title_follower;
                     } else if (iconClass.contains("fa-heart")) {
-                        title = "New Like";
+                        titleRes = R.string.notification_title_like;
                     } else {
-                        title = "Backloggd";
+                        titleRes = R.string.notification_title_default;
                     }
+                    String title = getApplicationContext().getString(titleRes);
 
                     Bitmap image = null;
                     if (imageUrl != null && !imageUrl.isEmpty()) {
@@ -137,8 +138,8 @@ public class NotificationCheckWorker extends Worker {
 
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Backloggd Notifications";
-            String description = "Channel for new backloggd.com notifications";
+            CharSequence name = context.getString(R.string.notification_channel_name);
+            String description = context.getString(R.string.notification_channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

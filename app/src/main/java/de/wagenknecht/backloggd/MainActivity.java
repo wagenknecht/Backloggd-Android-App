@@ -2,7 +2,7 @@ package de.wagenknecht.backloggd;
 
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_RELEASES_LATEST;
 import static de.wagenknecht.backloggd.ApiConstants.GITHUB_REPO_URL;
-import static de.wagenknecht.backloggd.ApiConstants.GITHUB_TAGS_API_URL;
+import static de.wagenknecht.backloggd.ApiConstants.GITHUB_LATEST_RELEASE_API_URL;
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGIN_URL;
 import static de.wagenknecht.backloggd.ApiConstants.LOGOUT_URL;
@@ -49,7 +49,7 @@ import androidx.work.WorkManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -58,9 +58,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -175,7 +172,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
+                try {
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException e) {
+                    Log.w(TAG, "No app can handle " + uri, e);
+                    Toast.makeText(MainActivity.this, R.string.no_app_for_link, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
 
@@ -511,23 +513,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkForUpdates() {
+        String currentVersion = getCurrentVersionName(this);
+        if (currentVersion == null) {
+            return;
+        }
+
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, GITHUB_TAGS_API_URL, null,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, GITHUB_LATEST_RELEASE_API_URL, null,
                 response -> {
-                    try {
-                        if (response.length() > 0) {
-                            JSONObject latestTag = response.getJSONObject(0);
-                            String latestVersion = latestTag.getString("name");
-                            String currentVersion = getCurrentVersionName(this);
+                    String latestVersion = response.optString("tag_name", "");
+                    if (latestVersion.isEmpty()) {
+                        Log.w(TAG, "Latest release has no tag_name, skipping update check.");
+                        return;
+                    }
 
-                            Log.d(TAG, "Latest version on GitHub: " + latestVersion);
-                            Log.d(TAG, "Current app version: " + currentVersion);
+                    Log.d(TAG, "Latest release on GitHub: " + latestVersion);
+                    Log.d(TAG, "Current app version: " + currentVersion);
 
-                            if (currentVersion != null && !latestVersion.equals(currentVersion)) {
-                                showUpdateDialog(latestVersion);
-                            }
-                        }                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing JSON for update check", e);
+                    if (isNewerVersion(latestVersion, currentVersion)) {
+                        showUpdateDialog(latestVersion);
                     }
                 },
                 error -> Log.e(TAG, "Error checking for updates", error)
@@ -535,15 +539,65 @@ public class MainActivity extends AppCompatActivity {
         queue.add(request);
     }
 
+    /**
+     * Compares dot-separated version numbers, tolerating an optional "v" prefix and a differing
+     * number of segments ("2.1" counts as newer than "2.0.3"). Only a strictly newer remote
+     * version returns true, so locally built versions ahead of the last release stay quiet.
+     */
+    private static boolean isNewerVersion(String remote, String local) {
+        String[] remoteParts = stripVersionPrefix(remote).split("\\.");
+        String[] localParts = stripVersionPrefix(local).split("\\.");
+        int segments = Math.max(remoteParts.length, localParts.length);
+        for (int i = 0; i < segments; i++) {
+            int remotePart = versionPart(remoteParts, i);
+            int localPart = versionPart(localParts, i);
+            if (remotePart != localPart) {
+                return remotePart > localPart;
+            }
+        }
+        return false;
+    }
+
+    private static String stripVersionPrefix(String version) {
+        String trimmed = version.trim();
+        if (trimmed.startsWith("v") || trimmed.startsWith("V")) {
+            return trimmed.substring(1);
+        }
+        return trimmed;
+    }
+
+    /** Leading digits of the given segment, or 0 for a missing or non-numeric one. */
+    private static int versionPart(String[] parts, int index) {
+        if (index >= parts.length) {
+            return 0;
+        }
+        String part = parts[index].trim();
+        int end = 0;
+        while (end < part.length() && Character.isDigit(part.charAt(end))) {
+            end++;
+        }
+        if (end == 0) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(part.substring(0, end));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private void showUpdateDialog(String newVersion) {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         new AlertDialog.Builder(this)
-                .setTitle("Update Available")
-                .setMessage("A new version (" + newVersion + ") is available. Would you like to download it?")
-                .setPositiveButton("Download", (dialog, which) -> {
+                .setTitle(R.string.update_available_title)
+                .setMessage(getString(R.string.update_available_message, newVersion))
+                .setPositiveButton(R.string.update_download, (dialog, which) -> {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_LATEST));
                     startActivity(browserIntent);
                 })
-                .setNegativeButton("Later", null)
+                .setNegativeButton(R.string.update_later, null)
                 .show();
     }
 
