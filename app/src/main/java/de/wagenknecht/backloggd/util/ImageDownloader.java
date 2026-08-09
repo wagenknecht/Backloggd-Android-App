@@ -16,6 +16,8 @@ public final class ImageDownloader {
     private static final String TAG = "ImageDownloader";
     private static final int TARGET_BITMAP_SIZE_PX = 512;
     private static final int MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024;
+    /** Without this, a stalled server would block the calling worker until WorkManager kills it. */
+    private static final int TIMEOUT_MS = 15000;
 
     private ImageDownloader() {}
 
@@ -25,6 +27,8 @@ public final class ImageDownloader {
         try {
             URL url = new URL(imageUrl);
             connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(TIMEOUT_MS);
+            connection.setReadTimeout(TIMEOUT_MS);
             connection.setDoInput(true);
             connection.connect();
 
