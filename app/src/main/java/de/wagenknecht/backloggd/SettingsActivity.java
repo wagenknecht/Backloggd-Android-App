@@ -19,10 +19,13 @@ public class SettingsActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_settings);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.settings_content, new SettingsFragment())
-                .commit();
+        // On a recreation the fragment manager restores the fragment itself.
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.settings_content, new SettingsFragment())
+                    .commit();
+        }
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -24,13 +24,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
+            <!--
+                No autoVerify: that needs an assetlinks.json on backloggd.com, which we cannot
+                publish. Users enable this filter manually under "Open by default".
+            -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
                 <data android:host="www.backloggd.com" />
-                <data android:scheme="https" />
                 <data android:host="backloggd.com" />
             </intent-filter>
         </activity>
