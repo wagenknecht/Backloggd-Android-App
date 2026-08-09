@@ -34,6 +34,8 @@
     <string name="update_available_message">A new version (%1$s) is available. Would you like to download it?</string>
     <string name="update_download">Download</string>
     <string name="update_later">Later</string>
+    <string name="whats_new_title">What\'s new in %1$s</string>
+    <string name="whats_new_dismiss">Got it</string>
     <string name="notification_channel_name">Backloggd Notifications</string>
     <string name="notification_channel_description">Channel for new backloggd.com notifications</string>
     <string name="notification_title_badge">New Badge</string>

@@ -228,9 +228,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Only on a fresh start, so a rotation does not check again.
+        // Only on a fresh start, so a rotation does not check again. Right after an update the
+        // release notes take precedence; the update check resumes on the next launch, which also
+        // keeps the two dialogs from stacking.
         if (savedInstanceState == null) {
-            UpdateChecker.checkAsync(this, this::showUpdateDialog);
+            boolean justUpdated = UpdateChecker.wasUpdatedSinceLastLaunch(this);
+            UpdateChecker.rememberInstalledVersion(this);
+            if (justUpdated) {
+                UpdateChecker.fetchInstalledReleaseNotes(this, this::showWhatsNewDialog);
+            } else {
+                UpdateChecker.checkAsync(this, this::showUpdateDialog);
+            }
         }
         askNotificationPermission();
         NotificationCheckWorker.schedule(this);
@@ -468,20 +476,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * @param apkUrl direct link to the release's APK, or null to fall back to the releases page.
-     */
-    private void showUpdateDialog(String newVersion, @Nullable String apkUrl) {
+    private void showUpdateDialog(@NonNull UpdateChecker.Release release) {
         if (isFinishing() || isDestroyed()) {
             return;
         }
-        String downloadUrl = apkUrl != null ? apkUrl : GITHUB_RELEASES_LATEST;
+        // Without an APK asset the releases page is the next best landing spot.
+        String downloadUrl = release.apkUrl != null ? release.apkUrl : GITHUB_RELEASES_LATEST;
+
+        StringBuilder message = new StringBuilder(
+                getString(R.string.update_available_message, release.version));
+        if (!release.notes.isEmpty()) {
+            message.append("\n\n").append(release.notes);
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle(R.string.update_available_title)
-                .setMessage(getString(R.string.update_available_message, newVersion))
+                .setMessage(message)
                 .setPositiveButton(R.string.update_download,
                         (dialog, which) -> openExternally(Uri.parse(downloadUrl)))
                 .setNegativeButton(R.string.update_later, null)
+                .show();
+    }
+
+    private void showWhatsNewDialog(@NonNull String version, @NonNull String notes) {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.whats_new_title, version))
+                .setMessage(notes)
+                .setPositiveButton(R.string.whats_new_dismiss, null)
                 .show();
     }
 
