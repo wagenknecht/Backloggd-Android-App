@@ -1,7 +1,6 @@
 package de.wagenknecht.backloggd.worker;
 
 import static de.wagenknecht.backloggd.ApiConstants.BACKLOGGD_URL;
-import static de.wagenknecht.backloggd.ApiConstants.SETTINGS_URL;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -44,6 +43,7 @@ import de.wagenknecht.backloggd.MainActivity;
 import de.wagenknecht.backloggd.R;
 import de.wagenknecht.backloggd.util.BackloggdRequest;
 import de.wagenknecht.backloggd.util.ImageDownloader;
+import de.wagenknecht.backloggd.util.UsernameHelper;
 
 public class WishlistCheckerWorker extends Worker {
 
@@ -58,45 +58,37 @@ public class WishlistCheckerWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        try {
+            return checkWishlist();
+        } catch (RuntimeException e) {
+            // The daily run schedules its own successor, so an unexpected failure would end the
+            // chain and silently stop all further reminders. Keep it going.
+            Log.e(TAG, "Unexpected failure while checking the wishlist.", e);
+            scheduleNextWorker(getApplicationContext());
+            return Result.failure();
+        }
+    }
+
+    private Result checkWishlist() {
+        Context context = getApplicationContext();
         Log.d(TAG, "Worker started. Checking wishlist for games releasing today.");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String username = prefs.getString("backloggd_username", null);
 
         String cookies = CookieManager.getInstance().getCookie(BACKLOGGD_URL);
+        if (cookies == null || cookies.isEmpty()) {
+            Log.w(TAG, "Could not get cookies. User is probably not logged in. Trying again tomorrow.");
+            scheduleNextWorker(context);
+            return Result.success();
+        }
 
-        if (username == null || username.isEmpty()) {
-            Log.d(TAG, "Username not found, trying to fetch from settings page.");
-
-            if (cookies == null || cookies.isEmpty()) {
-                Log.w(TAG, "Could not get cookies. User is probably not logged in. Aborting.");
-                return Result.success();
-            }
-
-            try {
-                Connection.Response response = BackloggdRequest
-                        .forUrl(getApplicationContext(), SETTINGS_URL, cookies)
-                        .execute();
-                if (response.statusCode() == 404) {
-                    Log.w(TAG, "User not logged in, settings page returned 404. Retrying in 30 minutes.");
-                    scheduleRetry(getApplicationContext(), 30, TimeUnit.MINUTES);
-                    return Result.failure();
-                }
-                Document settingsDoc = response.parse();
-                // Find the input field with id 'user_username' and extract its 'value' attribute.
-                Element usernameInput = settingsDoc.selectFirst("input#user_username");
-                if (usernameInput != null) {
-                    username = usernameInput.val();
-                    prefs.edit().putString("backloggd_username", username).apply();
-                    Log.d(TAG, "Found and saved username: " + username);
-                } else {
-                    Log.w(TAG, "Could not find username on settings page. Retrying in 30 minutes.");
-                    scheduleRetry(getApplicationContext(), 30, TimeUnit.MINUTES);
-                    return Result.failure();
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to connect to Backloggd settings page.", e);
-                return Result.retry();
-            }
+        String username = UsernameHelper.getCached(context);
+        if (username == null) {
+            Log.d(TAG, "Username not cached, fetching it from the settings page.");
+            username = UsernameHelper.fetchSync(context);
+        }
+        if (username == null) {
+            Log.w(TAG, "Could not determine the username. Retrying in 30 minutes.");
+            scheduleRetry(context, 30, TimeUnit.MINUTES);
+            return Result.failure();
         }
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -104,7 +96,7 @@ public class WishlistCheckerWorker extends Worker {
 
         try {
             Connection.Response wishlistResponse = BackloggdRequest
-                    .forUrl(getApplicationContext(), wishlistUrl, cookies)
+                    .forUrl(context, wishlistUrl, cookies)
                     .execute();
             int statusCode = wishlistResponse.statusCode();
             if (statusCode != 200) {
@@ -128,16 +120,15 @@ public class WishlistCheckerWorker extends Worker {
                     }
 
                     if (isReleasedToday(releaseDateStr)) {
-                        SharedPreferences releasePrefs = getApplicationContext().getSharedPreferences("wishlist_release_dates", Context.MODE_PRIVATE);
+                        SharedPreferences releasePrefs = context.getSharedPreferences("wishlist_release_dates", Context.MODE_PRIVATE);
                         String storedDate = releasePrefs.getString(gameTitle, "");
 
                         if (!releaseDateStr.equals(storedDate)) {
                             Log.d(TAG, "Found game releasing today: " + gameTitle);
                             Bitmap gameCoverBitmap = ImageDownloader.downloadDownsampled(imageUrl);
-                            Context appContext = getApplicationContext();
                             showPushNotification(
-                                    appContext.getString(R.string.wishlist_notification_title),
-                                    appContext.getString(R.string.wishlist_notification_message, gameTitle),
+                                    context.getString(R.string.wishlist_notification_title),
+                                    context.getString(R.string.wishlist_notification_message, gameTitle),
                                     gameTitle,
                                     gameCoverBitmap);
                             releasePrefs.edit().putString(gameTitle, releaseDateStr).apply();
@@ -152,7 +143,7 @@ public class WishlistCheckerWorker extends Worker {
             return Result.retry();
         }
 
-        scheduleNextWorker(getApplicationContext());
+        scheduleNextWorker(context);
         return Result.success();
     }
 
