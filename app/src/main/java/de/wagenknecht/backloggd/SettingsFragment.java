@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,15 +18,10 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import de.wagenknecht.backloggd.BuildConfig;
 import de.wagenknecht.backloggd.worker.NotificationCheckWorker;
@@ -73,8 +67,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         ListPreference notificationInterval = findPreference("notification_interval");
         if (notificationInterval != null) {
             notificationInterval.setOnPreferenceChangeListener((preference, newValue) -> {
-                long interval = Long.parseLong((String) newValue);
-                scheduleNotificationCheckWorker(requireContext(), interval);
+                NotificationCheckWorker.schedule(requireContext(), Long.parseLong((String) newValue));
                 return true;
             });
         }
@@ -132,27 +125,4 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         preference.setSummary(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
     }
 
-    private void scheduleNotificationCheckWorker(Context context, long interval) {
-        if (interval == -1) {
-            WorkManager.getInstance(context).cancelUniqueWork("NotificationCheck");
-            Log.d("SettingsFragment", "Notification worker cancelled by user setting.");
-            return;
-        }
-
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-
-        PeriodicWorkRequest notificationWorkRequest =
-                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, interval, TimeUnit.MINUTES)
-                        .setConstraints(constraints)
-                        .build();
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "NotificationCheck",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                notificationWorkRequest);
-
-        Log.d("SettingsFragment", "Notification worker scheduled for every " + interval + " minutes.");
-    }
 }

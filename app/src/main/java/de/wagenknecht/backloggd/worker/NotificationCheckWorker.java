@@ -18,8 +18,16 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.preference.PreferenceManager;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
@@ -35,9 +43,49 @@ public class NotificationCheckWorker extends Worker {
 
     private static final String TAG = "NotificationCheckWorker";
     private static final String CHANNEL_ID = "BACKLOGGD_NOTIFICATIONS";
+    public static final String WORK_NAME = "NotificationCheck";
+    private static final String PREF_INTERVAL = "notification_interval";
+    private static final String DEFAULT_INTERVAL_MINUTES = "15";
+    /** Interval value the settings screen uses for "Never". */
+    private static final long INTERVAL_NEVER = -1;
 
     public NotificationCheckWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+    }
+
+    /** Schedules the periodic check using the interval currently stored in the preferences. */
+    public static void schedule(@NonNull Context context) {
+        String stored = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_INTERVAL, DEFAULT_INTERVAL_MINUTES);
+        schedule(context, Long.parseLong(stored));
+    }
+
+    /**
+     * Schedules the periodic check, or cancels it when the user picked "Never". Takes the interval
+     * explicitly because the settings screen has to act on the new value before it is persisted.
+     */
+    public static void schedule(@NonNull Context context, long intervalMinutes) {
+        if (intervalMinutes == INTERVAL_NEVER) {
+            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME);
+            Log.d(TAG, "Notification worker cancelled by user setting.");
+            return;
+        }
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        PeriodicWorkRequest request =
+                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, intervalMinutes, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .build();
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                request);
+
+        Log.d(TAG, "Notification worker scheduled for every " + intervalMinutes + " minutes.");
     }
 
     @NonNull

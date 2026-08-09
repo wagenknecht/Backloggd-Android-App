@@ -11,12 +11,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -40,12 +38,6 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -53,8 +45,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
-
-import java.util.concurrent.TimeUnit;
 
 import de.wagenknecht.backloggd.util.UpdateChecker;
 import de.wagenknecht.backloggd.util.UsernameHelper;
@@ -243,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             UpdateChecker.checkAsync(this, this::showUpdateDialog);
         }
         askNotificationPermission();
-        startNotificationWorker();
+        NotificationCheckWorker.schedule(this);
         WishlistCheckerWorker.scheduleNextWorker(this);
 
         handleIntent(getIntent());
@@ -299,33 +289,6 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
         }
-    }
-
-    private void startNotificationWorker() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        long interval = Long.parseLong(prefs.getString("notification_interval", "15"));
-
-        if (interval == -1) {
-            WorkManager.getInstance(this).cancelUniqueWork("NotificationCheck");
-            Log.d(TAG, "Notification worker cancelled by user setting.");
-            return;
-        }
-
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-
-        PeriodicWorkRequest notificationWorkRequest =
-                new PeriodicWorkRequest.Builder(NotificationCheckWorker.class, interval, TimeUnit.MINUTES)
-                        .setConstraints(constraints)
-                        .build();
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "NotificationCheck",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                notificationWorkRequest);
-
-        Log.d(TAG, "Notification worker scheduled for every " + interval + " minutes.");
     }
 
     private void askNotificationPermission() {
