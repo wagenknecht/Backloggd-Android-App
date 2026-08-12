@@ -40,11 +40,11 @@ To install the app, download the latest APK from the [releases page](https://git
 
 ## Star History
 
-<a href="https://www.star-history.com/#wagenknecht/Backloggd-Android-App&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=wagenknecht%2FBackloggd-Android-App&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=wagenknecht/Backloggd-Android-App&type=date&theme=dark&legend=top-left&sealed_token=aqIyeusaRsLAJhKqyPNFZkZ5jBOnRHZqM7i12R9-pVIJLd-CeTxsRAWzMlKBu8-po6pbJ16e_EcRlnxKnxx5kFxeJVs5K3E-4rngxBhAprmAMq9RRgmtqC0xe1YanKD_RHRo8E2BFMY7f20ngqxnMniSfvb0zo1Iv9_i_c-X8SL4NGrDGLoMINEBD3pv" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left&sealed_token=aqIyeusaRsLAJhKqyPNFZkZ5jBOnRHZqM7i12R9-pVIJLd-CeTxsRAWzMlKBu8-po6pbJ16e_EcRlnxKnxx5kFxeJVs5K3E-4rngxBhAprmAMq9RRgmtqC0xe1YanKD_RHRo8E2BFMY7f20ngqxnMniSfvb0zo1Iv9_i_c-X8SL4NGrDGLoMINEBD3pv" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=wagenknecht/Backloggd-Android-App&type=date&legend=top-left&sealed_token=aqIyeusaRsLAJhKqyPNFZkZ5jBOnRHZqM7i12R9-pVIJLd-CeTxsRAWzMlKBu8-po6pbJ16e_EcRlnxKnxx5kFxeJVs5K3E-4rngxBhAprmAMq9RRgmtqC0xe1YanKD_RHRo8E2BFMY7f20ngqxnMniSfvb0zo1Iv9_i_c-X8SL4NGrDGLoMINEBD3pv" />
  </picture>
 </a>
 
